@@ -27,6 +27,7 @@ export default {
 4. Install postcss: `npm install -D @tailwindcss/postcss`
 5. Add the Tailwind directives to your `./src/index.css`:
 ```css
+@import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
