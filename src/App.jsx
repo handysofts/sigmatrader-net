@@ -1,0 +1,497 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Search, 
+  LayoutDashboard, 
+  BarChart3, 
+  Calendar as CalendarIcon, 
+  Database, 
+  Mail,
+  ArrowUpRight,
+  TrendingUp,
+  Globe,
+  Activity,
+  Loader2,
+  Maximize2,
+  PieChart,
+  Gauge,
+  Zap,
+  Clock,
+  Briefcase,
+  ExternalLink,
+  ShieldCheck,
+  ChevronRight,
+  Award,
+  BarChart,
+  QrCode,
+  X,
+  Share2,
+  Download,
+  AlertTriangle
+} from 'lucide-react';
+
+// --- TradingView Widget Components ---
+
+const TickerTape = () => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "symbols": [
+        { "proName": "FOREXCOM:SPX500", "title": "S&P 500" },
+        { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100" },
+        { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+        { "proName": "COMEX:GC1!", "title": "Gold" },
+        { "description": "Apple", "proName": "NASDAQ:AAPL" },
+        { "description": "Oracle", "proName": "NYSE:ORCL" }
+      ],
+      "showSymbolLogo": true,
+      "colorTheme": "dark",
+      "isTransparent": true,
+      "displayMode": "adaptive",
+      "locale": "en"
+    });
+    container.current.appendChild(script);
+  }, []);
+  return <div ref={container} className="w-full border-b border-gray-800 bg-black/50 backdrop-blur-md min-h-[46px]"></div>;
+};
+
+const TechnicalAnalysis = ({ symbol }) => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "interval": "1D", "width": "100%", "isTransparent": true, "height": "100%", "symbol": symbol,
+      "showIntervalTabs": true, "displayMode": "single", "locale": "en", "colorTheme": "dark"
+    });
+    container.current.appendChild(script);
+  }, [symbol]);
+  return <div className="h-[400px] w-full bg-gray-900/40 rounded-3xl p-4 border border-gray-800 shadow-xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const AdvancedChart = ({ symbol }) => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "autosize": true, "symbol": symbol, "interval": "W", "theme": "dark", "style": "1", "locale": "en",
+      "enable_publishing": false, "allow_symbol_change": true, "calendar": true, "details": true, "hotlist": true
+    });
+    container.current.appendChild(script);
+  }, [symbol]);
+  return <div className="h-[650px] w-full bg-gray-900 rounded-3xl overflow-hidden border border-gray-800 shadow-2xl relative"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const FundamentalData = ({ symbol }) => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "isTransparent": true, "largeChartHeight": 350, "displayMode": "regular", "width": "100%", "height": "100%",
+      "colorTheme": "dark", "symbol": symbol, "locale": "en"
+    });
+    container.current.appendChild(script);
+  }, [symbol]);
+  return <div className="h-[500px] w-full bg-gray-900/50 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const CompanyProfile = ({ symbol }) => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({ "symbol": symbol, "width": "100%", "height": "100%", "colorTheme": "dark", "isTransparent": true, "locale": "en" });
+    container.current.appendChild(script);
+  }, [symbol]);
+  return <div className="h-[400px] w-full bg-gray-900 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+// --- Home Components ---
+
+const EconomicCalendar = () => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "colorTheme": "dark", "isTransparent": true, "width": "100%", "height": "100%", "locale": "en",
+      "importanceFilter": "0,1", "currencyFilter": "USD"
+    });
+    container.current.appendChild(script);
+  }, []);
+  return <div className="h-[450px] w-full bg-gray-900/50 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const MarketOverviewWidget = () => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "colorTheme": "dark", "dateRange": "12M", "showChart": true, "locale": "en", "isTransparent": true, "showSymbolLogo": true, "width": "100%", "height": "100%",
+      "tabs": [{ "title": "Indices", "symbols": [{ "s": "FOREXCOM:SPX500", "d": "S&P 500" }, { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" }, { "s": "FOREXCOM:DJI", "d": "Dow 30" }] }]
+    });
+    container.current.appendChild(script);
+  }, []);
+  return <div className="h-[450px] w-full bg-gray-900/50 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const MarketHeatmap = () => {
+  const container = useRef();
+  useEffect(() => {
+    if (!container.current) return;
+    container.current.innerHTML = "";
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-stock-heatmap.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      "exchanges": [], "dataSource": "S&P500", "grouping": "sector", "blockSize": "market_cap_basic", "blockColor": "change", "locale": "en", "colorTheme": "dark", "hasTopBar": false, "isTransparent": true, "width": "100%", "height": "100%"
+    });
+    container.current.appendChild(script);
+  }, []);
+  return <div className="h-[600px] w-full bg-gray-900/50 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
+};
+
+const EarningsHubWidget = () => {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div className="h-[700px] w-full bg-[#0d1117] rounded-3xl border border-gray-800 shadow-2xl overflow-hidden relative group">
+      {loading && <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 z-10 text-[10px] font-black uppercase text-gray-500 tracking-widest animate-pulse"><Loader2 className="mb-2 animate-spin text-blue-500" size={24}/>Syndicating Feed...</div>}
+      <iframe src="https://earningshub.com/embed/calendar?theme=dark&calendarView=week&filter=popular" className="w-full h-full border-none" onLoad={() => setLoading(false)} title="EarningsHub" />
+    </div>
+  );
+};
+
+// --- Portfolio Hub ---
+
+const SavvyTraderPortfolio = () => {
+  const [showQR, setShowQR] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const portfolioUrl = "https://savvytrader.com/vmustafayev/sigmatrader?tab=summary";
+  const qrImageUrl = "https://sigmatrader.net/images/savvy-trader-SigmaTrader-swing-qr-code.png";
+
+  const stats = [
+    { label: 'Total Return', value: 'Verified', icon: <TrendingUp size={16} />, color: 'text-emerald-400' },
+    { label: 'Primary Strategy', value: 'Swing Trading', icon: <Zap size={16} />, color: 'text-amber-400' },
+    { label: 'Asset Classes', value: 'Equity / Tech', icon: <PieChart size={16} />, color: 'text-blue-400' },
+    { label: 'Status', value: 'Active', icon: <ShieldCheck size={16} />, color: 'text-emerald-500' }
+  ];
+
+  return (
+    <div className="w-full flex flex-col gap-8 animate-in fade-in duration-500 max-w-4xl mx-auto py-10 relative">
+      
+      {/* Official QR Code Modal */}
+      {showQR && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6" onClick={() => setShowQR(false)}>
+          <div className="bg-[#0a0a0a] border border-gray-800 p-8 rounded-[3rem] text-center space-y-6 max-w-sm w-full animate-in zoom-in duration-300 shadow-2xl shadow-blue-500/10" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-2">
+               <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] font-black text-gray-400 tracking-[0.2em]">OFFICIAL SAVVYTRADER QR</span>
+               </div>
+               <button onClick={() => setShowQR(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-white"><X size={18} /></button>
+            </div>
+            
+            <div className="relative bg-white p-3 rounded-3xl overflow-hidden aspect-square flex items-center justify-center">
+              {!imgLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <Loader2 className="animate-spin text-blue-600" size={32} />
+                </div>
+              )}
+              <img 
+                src={qrImageUrl} 
+                alt="SigmaTrader QR Code" 
+                className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                onLoad={() => setImgLoaded(true)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-xl font-black text-white tracking-tight">SigmaTrader Swing</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Scan with your mobile camera to launch the verified portfolio terminal instantly.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button 
+                onClick={() => setShowQR(false)} 
+                className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-white/5"
+              >
+                Close
+              </button>
+              <a 
+                href={qrImageUrl} 
+                download 
+                target="_blank"
+                className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-2"
+              >
+                <Download size={14} /> Save
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
+          <Award size={12} /> Verified Track Record
+        </div>
+        <h2 className="text-5xl font-black text-white tracking-tight">SigmaTrader <span className="text-blue-500">Swing</span></h2>
+        <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
+          SigmaTrader Swing focuses on medium-term trend capture. We share all real-time trade executions and position adjustments through our verified portal.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {stats.map((s, idx) => (
+          <div key={idx} className="bg-gray-900/40 border border-gray-800 p-6 rounded-3xl text-center space-y-2 hover:border-gray-700 transition-all">
+            <div className={`mx-auto w-10 h-10 rounded-2xl bg-gray-800 flex items-center justify-center ${s.color}`}>
+              {s.icon}
+            </div>
+            <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{s.label}</div>
+            <div className="text-lg font-bold text-white">{s.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="relative group bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-1 shadow-2xl shadow-blue-500/20">
+        <div className="bg-gray-950 rounded-[2.3rem] p-10 flex flex-col items-center text-center gap-6 overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+             <BarChart size={200} />
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-2xl font-black text-white">Full Trade Transparency</h3>
+            <p className="text-gray-500 text-sm">SavvyTrader prohibits direct embedding for security. Launch the portal below to view all current Swing positions and trade history.</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center z-10">
+            <a 
+              href={portfolioUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group/btn relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-blue-600/30"
+            >
+              Launch Portal
+              <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+            </a>
+            
+            <button 
+              onClick={() => setShowQR(true)}
+              className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all"
+            >
+              <QrCode size={18} />
+              Share QR
+            </button>
+          </div>
+
+          <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest flex items-center gap-4">
+            <span className="flex items-center gap-1"><ShieldCheck size={12} /> SECURE REDIRECT</span>
+            <span className="flex items-center gap-1"><Activity size={12} /> REAL-TIME SYNC</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-900/20 border border-gray-800/50 p-8 rounded-[2.5rem]">
+          <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Strategy Methodology</h4>
+          <p className="text-xs text-gray-400 leading-loose italic">
+            "The SigmaTrader Swing methodology captures multi-week trends in high-liquidity tech assets. By combining quantitative RSI-based oscillators with fundamental catalyst identification, we aim to enter positions before major institutional rotations."
+          </p>
+        </div>
+        
+        <div className="bg-red-500/5 border border-red-500/10 p-8 rounded-[2.5rem] flex flex-col justify-center">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle size={14} className="text-red-500" />
+            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Financial Disclaimer</h4>
+          </div>
+          <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
+            This content is for informational purposes only and not financial advice. Trading securities involves risk. Past performance is not indicative of future results. SigmaTrader is not a registered financial advisor.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+
+export default function App() {
+  const [view, setView] = useState('HOME');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentSymbol, setCurrentSymbol] = useState('NYSE:ORCL');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const query = searchQuery.trim().toUpperCase();
+    if (!query) return;
+    let formatted = query;
+    if (!query.includes(':')) {
+        const nyseTickers = ['ORCL', 'IBM', 'GE', 'F', 'T', 'XOM', 'BRK.B', 'WMT', 'JPM'];
+        formatted = nyseTickers.includes(query) ? `NYSE:${query}` : query;
+    }
+    setCurrentSymbol(formatted);
+    setView('TERMINAL');
+    setSearchQuery('');
+  };
+
+  const ticker = currentSymbol.includes(':') ? currentSymbol.split(':')[1] : currentSymbol;
+
+  const externalLinks = [
+    { name: 'Finviz', url: `https://finviz.com/quote.ashx?t=${ticker}`, color: 'bg-blue-500/10 text-blue-400' },
+    { name: 'Dataroma', url: `https://www.dataroma.com/m/stock.php?sym=${ticker}`, color: 'bg-amber-500/10 text-amber-400' },
+    { name: 'ValueInvesting', url: `https://valueinvesting.io/stock/${ticker}`, color: 'bg-emerald-500/10 text-emerald-400' },
+    { name: 'SavvyTrader', url: `https://savvytrader.com/q/${ticker}`, color: 'bg-indigo-500/10 text-indigo-400' },
+    { name: 'SEC Filings', url: `https://www.sec.gov/edgar/search/#/category=custom&entityName=${ticker}&forms=10-K%252C10-Q%252C13F-HR`, color: 'bg-red-500/10 text-red-400' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-gray-100 font-sans flex flex-col">
+      <TickerTape />
+
+      <nav className="sticky top-0 z-50 border-b border-gray-800 bg-[#050505]/95 backdrop-blur-xl">
+        <div className="max-w-full mx-auto px-6 h-16 flex items-center justify-between gap-8">
+          <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => setView('HOME')}>
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">Σ</div>
+            <span className="text-xl font-black tracking-tight text-white hidden sm:inline">SigmaTrader<span className="text-blue-500">.Net</span></span>
+          </div>
+
+          <form onSubmit={handleSearch} className="relative group flex-1 max-w-2xl">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Search ticker (e.g. NVDA, AAPL)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2.5 pl-12 pr-4 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600"
+            />
+          </form>
+
+          <div className="flex items-center gap-4">
+             <button onClick={() => setView('HOME')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'HOME' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Markets</button>
+             <button onClick={() => setView('PORTFOLIO')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}><Briefcase size={14} /> Portfolio</button>
+             <button onClick={() => setView('TERMINAL')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'TERMINAL' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Terminal</button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-900/10 to-black">
+        <div className="w-full px-6 py-8">
+          {view === 'HOME' && (
+            <div className="max-w-[1600px] mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><TrendingUp size={14} className="text-blue-500" /> Market Benchmarks</h3>
+                    <MarketOverviewWidget />
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Econ Events (Med/High Impact)</h3>
+                    <EconomicCalendar />
+                  </div>
+               </div>
+               <div className="space-y-4">
+                  <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Activity size={14} className="text-cyan-500" /> S&P 500 Sector Performance</h3>
+                  <MarketHeatmap />
+               </div>
+               <div className="space-y-4">
+                  <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><CalendarIcon size={14} className="text-blue-500" /> Popular Earnings Week</h3>
+                  <EarningsHubWidget />
+               </div>
+            </div>
+          )}
+
+          {view === 'PORTFOLIO' && (
+            <div className="max-w-[1400px] mx-auto">
+               <SavvyTraderPortfolio />
+            </div>
+          )}
+
+          {view === 'TERMINAL' && (
+            <div className="space-y-8 animate-in fade-in duration-500">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-gray-800">
+                <div>
+                  <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-3">
+                    {ticker} <span className="text-lg font-medium text-gray-500">{currentSymbol.split(':')[0]}</span>
+                  </h1>
+                  <p className="text-blue-500 text-[10px] mt-1 uppercase font-black tracking-[0.3em]">Institutional Grade Terminal</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {externalLinks.map(link => (
+                    <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className={`px-4 py-2 rounded-xl border border-white/5 flex items-center gap-2 text-[11px] font-black transition-all hover:bg-white/5 ${link.color}`}>
+                      {link.name} <ArrowUpRight size={14} />
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="w-full">
+                  <AdvancedChart symbol={currentSymbol} />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                   <div className="space-y-4">
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                        <Zap size={14} className="text-yellow-500" /> Technical Sentiment
+                      </h3>
+                      <TechnicalAnalysis symbol={currentSymbol} />
+                   </div>
+                   <div className="space-y-4 lg:col-span-2">
+                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                        <Globe size={14} className="text-blue-500" /> Corporate Profile & Context
+                      </h3>
+                      <CompanyProfile symbol={currentSymbol} />
+                   </div>
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
+                    <PieChart size={14} className="text-amber-500" /> Multi-Year Financials
+                  </h3>
+                  <FundamentalData symbol={currentSymbol} />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      <footer className="border-t border-gray-800 bg-black/80 py-4 px-6 flex justify-between items-center text-[9px] text-gray-600 font-bold uppercase tracking-widest">
+          <span>SigmaTrader Terminal Protocol v3.1.0</span>
+          <div className="flex gap-4">
+            <span className="text-emerald-500/60 flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full" /> Data Synchronized</span>
+            <span>&copy; {new Date().getFullYear()}</span>
+          </div>
+      </footer>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
+        @keyframes zoom-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-in { animation: fade-in 0.4s ease-out forwards; }
+        .zoom-in { animation: zoom-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      `}} />
+    </div>
+  );
+}
