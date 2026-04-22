@@ -26,7 +26,11 @@ import {
   X,
   Share2,
   Download,
-  AlertTriangle
+  AlertTriangle,
+  Filter,
+  Users,
+  LineChart,
+  Eye
 } from 'lucide-react';
 
 // --- TradingView Widget Components ---
@@ -124,6 +128,108 @@ const CompanyProfile = ({ symbol }) => {
   return <div className="h-[400px] w-full bg-gray-900 rounded-3xl p-4 border border-gray-800 shadow-2xl overflow-hidden"><div ref={container} className="h-full w-full" /></div>;
 };
 
+// --- Screener Components ---
+
+const ScreenerHub = () => {
+  const screeners = [
+    {
+      title: "Insider Trading Activity",
+      description: "Follow the 'Smart Money' with Barchart's real-time tracker of corporate officers and directors buying their own stock.",
+      url: "https://www.barchart.com/investing-ideas/insider-trading-activity",
+      icon: <Eye className="text-red-500" />,
+      tags: ["High Signal", "Filings", "Barchart"]
+    },
+    {
+      title: "52-Week Low Large Caps",
+      description: "High quality large-cap stocks with positive earnings growth trading near annual lows. Potential value rotation candidates.",
+      url: "https://finviz.com/screener.ashx?v=111&f=cap_largeover%2Cfa_div_pos%2Cfa_epsyoy_pos%2Cfa_epsyoy1_pos%2Cta_highlow52w_a0to10h%2Ctargetprice_above&ft=4&o=-marketcap&ar=180&preset=s44313929",
+      icon: <Filter className="text-blue-500" />,
+      tags: ["Large Cap", "Value", "52W Low"]
+    },
+    {
+      title: "Institutional Insider Buys",
+      description: "Real-time tracking of transaction values over $100k where C-suite executives are increasing their personal stakes.",
+      url: "https://finviz.com/insidertrading?or=-10&tv=100000&tc=1&o=-transactionValue",
+      icon: <Users className="text-emerald-500" />,
+      tags: ["Insider", "High Conviction", "Finviz"]
+    },
+    {
+      title: "Current Market Valuation",
+      description: "Track the Buffet Indicator, P/E ratios, and yield curves to determine overall stock market risk vs historical averages.",
+      url: "https://www.currentmarketvaluation.com/",
+      icon: <LineChart className="text-amber-500" />,
+      tags: ["Macro", "Valuation", "Risk"]
+    }
+  ];
+
+  return (
+    <div className="w-full space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
+      <div className="border-b border-gray-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Sigma <span className="text-blue-500">Screener</span> Hub</h2>
+          <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and institutional flow tracking portals.</p>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-2xl">
+           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+           <span className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Live Data Pipelines Active</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {screeners.map((screener, idx) => (
+          <div key={idx} className="group bg-gray-900/30 border border-gray-800 p-8 rounded-[2.5rem] hover:border-blue-500/50 transition-all flex flex-col justify-between h-full shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+               {React.cloneElement(screener.icon, { size: 120 })}
+            </div>
+
+            <div className="space-y-6 relative z-10">
+              <div className="flex justify-between items-start">
+                <div className="p-4 bg-gray-800/50 rounded-2xl group-hover:bg-blue-500/10 transition-colors">
+                  {screener.icon}
+                </div>
+                <div className="flex flex-wrap gap-2 justify-end">
+                  {screener.tags.map(tag => (
+                    <span key={tag} className="text-[8px] font-black uppercase tracking-widest px-2 py-1 bg-white/5 border border-white/5 text-gray-400 rounded-lg">{tag}</span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-white mb-3 group-hover:text-blue-400 transition-colors">{screener.title}</h3>
+                <p className="text-gray-400 text-xs leading-loose font-medium">
+                  {screener.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-800/50 relative z-10">
+              <a
+                href={screener.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 hover:text-blue-400 transition-all"
+              >
+                Launch Intelligence Feed <ExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-blue-600/5 border border-blue-600/10 rounded-[2.5rem] p-8 flex items-center gap-6">
+        <div className="hidden sm:block p-4 bg-blue-600/20 rounded-full">
+          <Database className="text-blue-400" size={24} />
+        </div>
+        <div>
+          <h4 className="text-sm font-black text-white uppercase tracking-wider">Dynamic Feed Notification</h4>
+          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+            These screeners and macro tools are refreshed in real-time. SigmaTrader.Net provides direct deep-links to ensure you are accessing the latest market data without proxy delays.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- Home Components ---
 
 const EconomicCalendar = () => {
@@ -203,7 +309,7 @@ const SavvyTraderPortfolio = () => {
 
   return (
     <div className="w-full flex flex-col gap-8 animate-in fade-in duration-500 max-w-4xl mx-auto py-10 relative">
-      
+
       {/* Official QR Code Modal */}
       {showQR && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6" onClick={() => setShowQR(false)}>
@@ -215,16 +321,16 @@ const SavvyTraderPortfolio = () => {
                </div>
                <button onClick={() => setShowQR(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-white"><X size={18} /></button>
             </div>
-            
+
             <div className="relative bg-white p-3 rounded-3xl overflow-hidden aspect-square flex items-center justify-center">
               {!imgLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                   <Loader2 className="animate-spin text-blue-600" size={32} />
                 </div>
               )}
-              <img 
-                src={qrImageUrl} 
-                alt="SigmaTrader QR Code" 
+              <img
+                src={qrImageUrl}
+                alt="SigmaTrader QR Code"
                 className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                 onLoad={() => setImgLoaded(true)}
               />
@@ -236,15 +342,15 @@ const SavvyTraderPortfolio = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <button 
-                onClick={() => setShowQR(false)} 
+              <button
+                onClick={() => setShowQR(false)}
                 className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-white/5"
               >
                 Close
               </button>
-              <a 
-                href={qrImageUrl} 
-                download 
+              <a
+                href={qrImageUrl}
+                download
                 target="_blank"
                 className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-2"
               >
@@ -259,8 +365,8 @@ const SavvyTraderPortfolio = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
           <Award size={12} /> Verified Track Record
         </div>
-        <h2 className="text-5xl font-black text-white tracking-tight">SigmaTrader <span className="text-blue-500">Swing</span></h2>
-        <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
+        <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500">Sigma</span></h2>
+        <p className="text-gray-400 max-w-xl mx-auto leading-relaxed text-center">
           SigmaTrader Swing focuses on medium-term trend capture. We share all real-time trade executions and position adjustments through our verified portal.
         </p>
       </div>
@@ -282,24 +388,24 @@ const SavvyTraderPortfolio = () => {
           <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
              <BarChart size={200} />
           </div>
-          
+
           <div className="space-y-2">
             <h3 className="text-2xl font-black text-white">Full Trade Transparency</h3>
             <p className="text-gray-500 text-sm">SavvyTrader prohibits direct embedding for security. Launch the portal below to view all current Swing positions and trade history.</p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-center z-10">
-            <a 
-              href={portfolioUrl} 
-              target="_blank" 
+            <a
+              href={portfolioUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="group/btn relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-blue-600/30"
             >
               Launch Portal
               <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
             </a>
-            
-            <button 
+
+            <button
               onClick={() => setShowQR(true)}
               className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all"
             >
@@ -317,18 +423,18 @@ const SavvyTraderPortfolio = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-900/20 border border-gray-800/50 p-8 rounded-[2.5rem]">
-          <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Strategy Methodology</h4>
-          <p className="text-xs text-gray-400 leading-loose italic">
+          <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 text-center md:text-left">Strategy Methodology</h4>
+          <p className="text-xs text-gray-400 leading-loose italic text-center md:text-left">
             "The SigmaTrader Swing methodology captures multi-week trends in high-liquidity tech assets. By combining quantitative RSI-based oscillators with fundamental catalyst identification, we aim to enter positions before major institutional rotations."
           </p>
         </div>
-        
-        <div className="bg-red-500/5 border border-red-500/10 p-8 rounded-[2.5rem] flex flex-col justify-center">
+
+        <div className="bg-red-500/5 border border-red-500/10 p-8 rounded-[2.5rem] flex flex-col justify-center items-center md:items-start">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={14} className="text-red-500" />
             <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Financial Disclaimer</h4>
           </div>
-          <p className="text-[11px] text-gray-500 leading-relaxed font-medium">
+          <p className="text-[11px] text-gray-500 leading-relaxed font-medium text-center md:text-left">
             This content is for informational purposes only and not financial advice. Trading securities involves risk. Past performance is not indicative of future results. SigmaTrader is not a registered financial advisor.
           </p>
         </div>
@@ -379,21 +485,22 @@ export default function App() {
             <span className="text-xl font-black tracking-tight text-white hidden sm:inline">SigmaTrader<span className="text-blue-500">.Net</span></span>
           </div>
 
-          <form onSubmit={handleSearch} className="relative group flex-1 max-w-2xl">
+          <form onSubmit={handleSearch} className="relative group flex-1 max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={18} />
             <input
               type="text"
               placeholder="Search ticker (e.g. NVDA, AAPL)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2.5 pl-12 pr-4 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600"
+              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2.5 pl-12 pr-4 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600 font-medium"
             />
           </form>
 
-          <div className="flex items-center gap-4">
-             <button onClick={() => setView('HOME')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'HOME' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Markets</button>
-             <button onClick={() => setView('PORTFOLIO')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}><Briefcase size={14} /> Portfolio</button>
-             <button onClick={() => setView('TERMINAL')} className={`text-xs font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'TERMINAL' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}>Terminal</button>
+          <div className="flex items-center gap-2">
+             <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Markets</button>
+             <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Filter size={14} /> Screener</button>
+             <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Briefcase size={14} /> Portfolio</button>
+             <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Terminal</button>
           </div>
         </div>
       </nav>
@@ -413,7 +520,19 @@ export default function App() {
                   </div>
                </div>
                <div className="space-y-4">
-                  <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Activity size={14} className="text-cyan-500" /> S&P 500 Sector Performance</h3>
+                  <div className="flex items-center justify-between px-2">
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                      <Activity size={14} className="text-cyan-500" /> S&P 500 Sector Performance
+                    </h3>
+                    <a
+                      href="https://www.tradingview.com/heatmap/stock/#%7B%22dataSource%22%3A%22SPX500%22%2C%22blockColor%22%3A%22change%22%2C%22blockSize%22%3A%22market_cap_basic%22%2C%22grouping%22%3A%22sector%22%7D"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[9px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 flex items-center gap-1.5 transition-colors group"
+                    >
+                      Expand to TradingView <ExternalLink size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </a>
+                  </div>
                   <MarketHeatmap />
                </div>
                <div className="space-y-4">
@@ -422,6 +541,8 @@ export default function App() {
                </div>
             </div>
           )}
+
+          {view === 'SCREENER' && <ScreenerHub />}
 
           {view === 'PORTFOLIO' && (
             <div className="max-w-[1400px] mx-auto">
@@ -478,7 +599,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-gray-800 bg-black/80 py-4 px-6 flex justify-between items-center text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>SigmaTrader Terminal Protocol v3.1.0</span>
+          <span>SigmaTrader Terminal Protocol v3.3.0</span>
           <div className="flex gap-4">
             <span className="text-emerald-500/60 flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full" /> Data Synchronized</span>
             <span>&copy; {new Date().getFullYear()}</span>
