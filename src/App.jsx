@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
-  LayoutDashboard, 
-  BarChart3, 
-  Calendar as CalendarIcon, 
-  Database, 
+  Home,
+  Monitor,
+  LayoutDashboard,
+  BarChart3,
+  Calendar as CalendarIcon,
+  Database,
   Mail,
   ArrowUpRight,
   TrendingUp,
@@ -515,11 +517,24 @@ export default function App() {
           </form>
 
           <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
-             <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Markets</button>
-             <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Filter size={14} /> Screener</button>
-             {/* SWAPPED: Portfolio is now before Terminal */}
-             <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Briefcase size={14} /> Portfolio</button>
-             <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Terminal</button>
+             {/* Home instead of Markets with Icon */}
+             <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
+                <Home size={14} /> Home
+             </button>
+
+             <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
+                <Filter size={14} /> Screener
+             </button>
+
+             {/* Terminal with Icon */}
+             <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
+                <Monitor size={14} /> Terminal
+             </button>
+
+             <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
+                <Briefcase size={14} /> Portfolio
+             </button>
+
              <div className="w-[1px] h-4 bg-gray-800 mx-2" />
              <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl text-gray-400 hover:text-blue-400 transition-all flex items-center gap-2">
                 <BookOpen size={14} /> Blog
