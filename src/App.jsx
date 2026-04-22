@@ -681,10 +681,15 @@ export default function App() {
 
       <nav className="sticky top-0 z-50 border-b border-gray-800 bg-[#050505]/95 backdrop-blur-xl">
         <div className="max-w-full mx-auto px-6 h-16 flex items-center justify-between gap-4 md:gap-8">
-          <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => navigate('HOME')}>
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">Σ</div>
-            <span className="text-xl font-black tracking-tight text-white hidden sm:inline">SigmaTrader<span className="text-blue-500">.Net</span></span>
-          </div>
+          <button onClick={() => setView('HOME')} className="flex items-center gap-3 group shrink-0">
+               <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform">
+                  <Activity className="text-white" size={24} />
+               </div>
+               <div className="hidden md:block text-left">
+                  <p className="text-lg font-black text-white leading-tight tracking-tighter">SIGMA<span className="text-blue-500">TRADER</span></p>
+                  <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Quantitative Research</p>
+               </div>
+          </button>
 
           <form onSubmit={handleSearch} className="relative group flex-1 max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={16} />

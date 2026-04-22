@@ -11,6 +11,9 @@
     @apply bg-[#050505] text-slate-50 antialiased;
     font-feature-settings: "ss01", "ss02", "cv01", "cv03";
   }
+  button {
+    @apply cursor-pointer;
+  }
 }
 
 @layer components {
