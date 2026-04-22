@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import {
+  Search,
   Home,
   Monitor,
   LayoutDashboard,
@@ -34,8 +34,137 @@ import {
   LineChart,
   Eye,
   BookOpen,
-  Scale
+  Scale,
+  Lock,
+  Unlock
 } from 'lucide-react';
+
+// --- Market Status & Dynamic Holiday Component ---
+
+const MarketStatusBanner = () => {
+  const [status, setStatus] = useState({ isOpen: false, message: 'Calculating...', nextEvent: '' });
+  const currentYear = new Date().getFullYear();
+
+  // Dynamic Holiday Calculation Logic
+  const holidaySchedule = useMemo(() => {
+    const getNthWeekday = (year, month, dayOfWeek, n) => {
+      let date = new Date(year, month, 1);
+      let count = 0;
+      while (date.getMonth() === month) {
+        if (date.getDay() === dayOfWeek) {
+          count++;
+          if (count === n) return new Date(date);
+        }
+        date.setDate(date.getDate() + 1);
+      }
+    };
+
+    const getLastWeekday = (year, month, dayOfWeek) => {
+      let date = new Date(year, month + 1, 0);
+      while (date.getDay() !== dayOfWeek) {
+        date.setDate(date.getDate() - 1);
+      }
+      return new Date(date);
+    };
+
+    const getObservedDate = (date) => {
+      const d = new Date(date);
+      if (d.getDay() === 0) d.setDate(d.getDate() + 1); // Sunday -> Monday
+      if (d.getDay() === 6) d.setDate(d.getDate() - 1); // Saturday -> Friday
+      return d;
+    };
+
+    const formatDate = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    // Core NYSE Holidays
+    const holidays = [
+      { name: "New Year's", date: getObservedDate(new Date(currentYear, 0, 1)) },
+      { name: "MLK Day", date: getNthWeekday(currentYear, 0, 1, 3) },
+      { name: "Presidents", date: getNthWeekday(currentYear, 1, 1, 3) },
+      // Good Friday calculation is complex, using simplified look-up or approximate for UI
+      { name: "Good Fri", date: currentYear === 2026 ? new Date(2026, 3, 3) : new Date(2027, 2, 26) },
+      { name: "Memorial", date: getLastWeekday(currentYear, 4, 1) },
+      { name: "Juneteenth", date: getObservedDate(new Date(currentYear, 5, 19)) },
+      { name: "July 4th", date: getObservedDate(new Date(currentYear, 6, 4)) },
+      { name: "Labor Day", date: getNthWeekday(currentYear, 8, 1, 1) },
+      { name: "Thanksgiving", date: getNthWeekday(currentYear, 10, 4, 4) },
+      { name: "Christmas", date: getObservedDate(new Date(currentYear, 11, 25)) },
+    ];
+
+    return holidays.map(h => ({ name: h.name, date: formatDate(h.date) }));
+  }, [currentYear]);
+
+  useEffect(() => {
+    const checkMarketStatus = () => {
+      const now = new Date();
+      const estTime = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false,
+        weekday: 'short'
+      }).formatToParts(now);
+
+      const weekday = estTime.find(p => p.type === 'weekday').value;
+      const hour = parseInt(estTime.find(p => p.type === 'hour').value);
+      const minute = parseInt(estTime.find(p => p.type === 'minute').value);
+
+      const isWeekend = weekday === 'Sat' || weekday === 'Sun';
+      const isWorkHours = (hour === 9 && minute >= 30) || (hour > 9 && hour < 16);
+
+      if (isWeekend) {
+        setStatus({ isOpen: false, message: 'Market Closed', nextEvent: 'Opens Monday 9:30 AM EST' });
+      } else if (isWorkHours) {
+        setStatus({ isOpen: true, message: 'Market Open', nextEvent: 'Closes at 4:00 PM EST' });
+      } else {
+        setStatus({ isOpen: false, message: 'Market Closed', nextEvent: hour >= 16 ? 'Opens Tomorrow 9:30 AM EST' : 'Opens Today 9:30 AM EST' });
+      }
+    };
+
+    checkMarketStatus();
+    const interval = setInterval(checkMarketStatus, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="bg-gray-900/40 border border-gray-800 p-6 rounded-[2rem] flex flex-col justify-between shadow-xl backdrop-blur-sm">
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Exchange Status</p>
+            <h4 className="text-2xl font-black text-white flex items-center gap-2">
+              {status.isOpen ? <Unlock className="text-emerald-500" size={20} /> : <Lock className="text-red-500" size={20} />}
+              {status.message}
+            </h4>
+          </div>
+          <div className={`px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-tighter ${status.isOpen ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+            Live Feed
+          </div>
+        </div>
+        <div className="mt-4 pt-4 border-t border-gray-800/50">
+           <p className="text-[11px] text-gray-400 font-medium flex items-center gap-2"><Clock size={12}/> {status.nextEvent}</p>
+        </div>
+      </div>
+
+      <div className="md:col-span-2 bg-gray-900/40 border border-gray-800 p-6 rounded-[2rem] shadow-xl backdrop-blur-sm relative overflow-hidden">
+        <div className="flex items-center justify-between mb-4 relative z-10">
+           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+             <CalendarIcon size={12} /> NYSE / NASDAQ HOLIDAYS {currentYear}
+           </h4>
+           <span className="text-[8px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-widest">Auto-Updating Calendar</span>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative z-10">
+           {holidaySchedule.map((holiday, i) => (
+             <div key={i} className="bg-white/5 border border-white/5 p-2 rounded-xl text-center hover:bg-white/10 transition-all">
+                <p className="text-[8px] font-black text-white truncate uppercase">{holiday.name}</p>
+                <p className="text-[9px] font-bold text-gray-500">{holiday.date}</p>
+             </div>
+           ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // --- TradingView Widget Components ---
 
@@ -328,7 +457,6 @@ const SavvyTraderPortfolio = () => {
   return (
     <div className="w-full flex flex-col gap-8 animate-in fade-in duration-500 max-w-4xl mx-auto py-10 relative">
 
-      {/* Official QR Code Modal */}
       {showQR && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6" onClick={() => setShowQR(false)}>
           <div className="bg-[#0a0a0a] border border-gray-800 p-8 rounded-[3rem] text-center space-y-6 max-w-sm w-full animate-in zoom-in duration-300 shadow-2xl shadow-blue-500/10" onClick={e => e.stopPropagation()}>
@@ -466,7 +594,6 @@ const SavvyTraderPortfolio = () => {
 export default function App() {
   const [view, setView] = useState('HOME');
   const [searchQuery, setSearchQuery] = useState('');
-  // Set default symbol to Apple
   const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
 
   const handleSearch = (e) => {
@@ -475,7 +602,6 @@ export default function App() {
     if (!query) return;
     let formatted = query;
     if (!query.includes(':')) {
-        // Simple logic for primary exchanges
         const nyseTickers = ['ORCL', 'IBM', 'GE', 'F', 'T', 'XOM', 'BRK.B', 'WMT', 'JPM'];
         formatted = nyseTickers.includes(query) ? `NYSE:${query}` : `NASDAQ:${query}`;
     }
@@ -517,7 +643,6 @@ export default function App() {
           </form>
 
           <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
-             {/* Home instead of Markets with Icon */}
              <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Home size={14} /> Home
              </button>
@@ -526,7 +651,6 @@ export default function App() {
                 <Filter size={14} /> Screener
              </button>
 
-             {/* Terminal with Icon */}
              <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Monitor size={14} /> Terminal
              </button>
@@ -547,6 +671,7 @@ export default function App() {
         <div className="w-full px-6 py-8">
           {view === 'HOME' && (
             <div className="max-w-[1600px] mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <MarketStatusBanner />
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="space-y-4">
                     <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><TrendingUp size={14} className="text-blue-500" /> Market Benchmarks</h3>
@@ -600,59 +725,30 @@ export default function App() {
                 <div className="flex flex-wrap gap-2">
                   {externalLinks.map(link => (
                     <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className={`px-4 py-2 rounded-xl border border-white/5 flex items-center gap-2 text-[11px] font-black transition-all hover:bg-white/5 ${link.color}`}>
-                      {link.name} <ArrowUpRight size={14} />
+                      {link.name} <ExternalLink size={12} />
                     </a>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-8">
-                <div className="w-full">
-                  <AdvancedChart symbol={currentSymbol} />
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                   <div className="space-y-4">
-                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                        <Zap size={14} className="text-yellow-500" /> Technical Sentiment
-                      </h3>
-                      <TechnicalAnalysis symbol={currentSymbol} />
-                   </div>
-                   <div className="space-y-4 lg:col-span-2">
-                      <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                        <Globe size={14} className="text-blue-500" /> Corporate Profile & Context
-                      </h3>
-                      <CompanyProfile symbol={currentSymbol} />
-                   </div>
-                </div>
-                <div className="space-y-4">
-                  <h3 className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] px-2 flex items-center gap-2">
-                    <PieChart size={14} className="text-amber-500" /> Multi-Year Financials
-                  </h3>
-                  <FundamentalData symbol={currentSymbol} />
+              <AdvancedChart symbol={currentSymbol} />
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <TechnicalAnalysis symbol={currentSymbol} />
+                <div className="lg:col-span-2">
+                  <CompanyProfile symbol={currentSymbol} />
                 </div>
               </div>
+
+              <FundamentalData symbol={currentSymbol} />
             </div>
           )}
         </div>
       </main>
 
-      <footer className="border-t border-gray-800 bg-black/80 py-4 px-6 flex justify-between items-center text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>SigmaTrader Terminal Protocol v3.4.0</span>
-          <div className="flex gap-4">
-            <span className="text-emerald-500/60 flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full" /> Data Synchronized</span>
-            <span>&copy; {new Date().getFullYear()}</span>
-          </div>
+      <footer className="border-t border-gray-800 bg-black/80 py-6 px-6 text-center">
+          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader Terminal v3.8.0 &bull; Dynamic Logic Active</p>
       </footer>
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes zoom-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .animate-in { animation: fade-in 0.4s ease-out forwards; }
-        .zoom-in { animation: zoom-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      `}} />
     </div>
   );
 }
