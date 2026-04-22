@@ -665,7 +665,7 @@ export default function App() {
   const externalLinks = [
     { name: 'Finviz', url: `https://finviz.com/quote.ashx?t=${ticker}`, color: 'bg-blue-500/10 text-blue-400' },
     { name: 'SavvyTrader', url: `https://savvytrader.com/q/${ticker}`, color: 'bg-indigo-500/10 text-indigo-400' },
-    { name: 'ValueInvesting', url: `https://valueinvesting.io/stock/${ticker}/valuation/intrinsic-value`, color: 'bg-emerald-500/10 text-emerald-400' },
+    { name: 'ValueInvesting', url: `https://valueinvesting.io/${ticker}/valuation/intrinsic-value`, color: 'bg-emerald-500/10 text-emerald-400' },
     { name: 'Dataroma', url: `https://www.dataroma.com/m/stock.php?sym=${ticker}`, color: 'bg-amber-500/10 text-amber-400' },
     { name: 'SEC Filings', url: `https://www.sec.gov/edgar/search/#/category=custom&entityName=${ticker}&forms=10-K%252C10-Q%252C13F-HR`, color: 'bg-red-500/10 text-red-400' }
   ];
