@@ -664,9 +664,9 @@ export default function App() {
 
   const externalLinks = [
     { name: 'Finviz', url: `https://finviz.com/quote.ashx?t=${ticker}`, color: 'bg-blue-500/10 text-blue-400' },
-    { name: 'Dataroma', url: `https://www.dataroma.com/m/stock.php?sym=${ticker}`, color: 'bg-amber-500/10 text-amber-400' },
-    { name: 'ValueInvesting', url: `https://valueinvesting.io/stock/${ticker}`, color: 'bg-emerald-500/10 text-emerald-400' },
     { name: 'SavvyTrader', url: `https://savvytrader.com/q/${ticker}`, color: 'bg-indigo-500/10 text-indigo-400' },
+    { name: 'ValueInvesting', url: `https://valueinvesting.io/stock/${ticker}/valuation/intrinsic-value`, color: 'bg-emerald-500/10 text-emerald-400' },
+    { name: 'Dataroma', url: `https://www.dataroma.com/m/stock.php?sym=${ticker}`, color: 'bg-amber-500/10 text-amber-400' },
     { name: 'SEC Filings', url: `https://www.sec.gov/edgar/search/#/category=custom&entityName=${ticker}&forms=10-K%252C10-Q%252C13F-HR`, color: 'bg-red-500/10 text-red-400' }
   ];
 
@@ -864,7 +864,7 @@ export default function App() {
 
           <div className="pt-8 border-t border-gray-900 text-center">
             <p className="text-[10px] text-gray-700 font-bold uppercase tracking-[0.4em]">
-              &copy; {new Date().getFullYear()} SIGMATRADER TERMINAL &bull; V3.10.0
+              &copy; {new Date().getFullYear()} SIGMATRADER &bull; V1.0.0
             </p>
           </div>
       </footer>
