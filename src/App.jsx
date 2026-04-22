@@ -40,8 +40,6 @@ import {
   Menu,
   Landmark,
   MessageSquare,
-  Twitter,
-  Github,
   Send
 } from 'lucide-react';
 
@@ -245,8 +243,7 @@ const ContactIntelligence = () => {
             <div className="flex flex-col gap-4 w-full md:w-auto">
               <a
                 href="mailto:contact@sigmatrader.net"
-                className="flex items-center justify-between gap-6 px-8 py-5 bg-gray-900 border border-gray-800 hover:border-blue-500/50 hover:bg-gray-800/50 rounded-2xl transition-all group/mail"
-              >
+                className="flex items-center justify-between gap-6 px-8 py-5 bg-gray-900 border border-gray-800 hover:border-blue-500/50 hover:bg-gray-800/50 rounded-2xl transition-all group/mail">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover/mail:scale-110 transition-transform">
                     <Mail size={20} />
@@ -258,17 +255,6 @@ const ContactIntelligence = () => {
                 </div>
                 <ArrowUpRight size={18} className="text-gray-600 group-hover/mail:text-blue-500 transition-colors" />
               </a>
-
-              <div className="flex gap-4">
-                <button className="flex-1 flex items-center justify-center gap-2 p-4 bg-gray-900 border border-gray-800 rounded-2xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all">
-                  <Twitter size={18} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Twitter</span>
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 p-4 bg-gray-900 border border-gray-800 rounded-2xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all">
-                  <Github size={18} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">GitHub</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -813,7 +799,7 @@ export default function App() {
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-gray-800">
                 <div>
                   <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter flex items-center gap-3">
-                    {ticker} <span className="text-sm md:text-lg font-medium text-gray-500">{currentSymbol.split(':')[0]}</span>
+                    {ticker}
                   </h1>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -858,11 +844,6 @@ export default function App() {
                 <li>
                   <a href="mailto:contact@sigmatrader.net" className="text-sm text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
                     <Mail size={14} className="group-hover:translate-x-1 transition-transform"/> contact@sigmatrader.net
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
-                    <Twitter size={14} className="group-hover:translate-x-1 transition-transform"/> @SigmaTraderNet
                   </a>
                 </li>
               </ul>
