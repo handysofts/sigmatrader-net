@@ -665,55 +665,11 @@ export default function App() {
   const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Robust symbol resolution
   const handleSearch = (e) => {
     e.preventDefault();
-    let query = searchQuery.trim().toUpperCase();
+    const query = searchQuery.trim().toUpperCase();
     if (!query) return;
-
-    // Handle symbols already containing an exchange prefix
-    if (query.includes(':')) {
-      setCurrentSymbol(query);
-    } else {
-      // Logic to determine exchange for common tickers if no prefix is provided
-      // NYSE typically has 1-3 letters, NASDAQ 4 letters (with exceptions)
-      const nyseList = [
-        'A', 'AA', 'ABT', 'ABBV', 'ACN', 'ADP', 'AEE', 'AEP', 'AES', 'AFL', 'AIG', 'AIV', 'AIZ', 'AJG', 'ALB', 'ALL', 'ALLE', 'AMC', 'AMT', 'ANET', 'ANTM', 'AON', 'AOS', 'APA', 'APD', 'APH', 'ARE', 'ATO', 'AVB', 'AVY', 'AWK', 'AXP', 'AYI', 'AZO',
-        'BA', 'BAC', 'BALL', 'BAX', 'BBWI', 'BBY', 'BDX', 'BEN', 'BF.B', 'BIIB', 'BIO', 'BK', 'BKNG', 'BKR', 'BLK', 'BMY', 'BR', 'BRK.A', 'BRK.B', 'BSX', 'BWA', 'BXP', 'BZUN',
-        'C', 'CAG', 'CAH', 'CARR', 'CAT', 'CB', 'CBOE', 'CBRE', 'CCI', 'CCL', 'CDAY', 'CE', 'CF', 'CFG', 'CHD', 'CHRW', 'CI', 'CINF', 'CL', 'CLX', 'CMA', 'CMC', 'CMG', 'CMI', 'CMS', 'CNC', 'CNP', 'COF', 'COO', 'COP', 'COST', 'CPB', 'CPRT', 'CPT', 'CRL', 'CRM', 'CSCO', 'CSX', 'CTAS', 'CTLT', 'CTRA', 'CTVA', 'CVS', 'CVX', 'CZR',
-        'D', 'DAL', 'DD', 'DE', 'DFS', 'DG', 'DGX', 'DHI', 'DHR', 'DIS', 'DISH', 'DLR', 'DLTR', 'DOV', 'DOW', 'DPZ', 'DRE', 'DRI', 'DTE', 'DUK', 'DVA', 'DVN', 'DXC',
-        'ECL', 'ED', 'EFX', 'EIX', 'EL', 'EMN', 'EMR', 'ENPH', 'EOG', 'EPAM', 'EQIX', 'EQR', 'ES', 'ESS', 'ETN', 'ETR', 'ETSY', 'EVRG', 'EW', 'EXC', 'EXPD', 'EXPE', 'EXR',
-        'F', 'FANG', 'FAST', 'FBHS', 'FCX', 'FDS', 'FDX', 'FE', 'FFIV', 'FIS', 'FISV', 'FITB', 'FLT', 'FMC', 'FRC', 'FRT', 'FTNT', 'FTV',
-        'GD', 'GE', 'GILD', 'GIS', 'GL', 'GLW', 'GM', 'GNRC', 'GOOG', 'GOOGL', 'GPC', 'GPN', 'GRMN', 'GS', 'GWW',
-        'HAL', 'HAS', 'HBI', 'HCA', 'HD', 'HES', 'HIG', 'HII', 'HOLX', 'HON', 'HPE', 'HPQ', 'HRL', 'HSIC', 'HST', 'HSY', 'HUM', 'HWM',
-        'IBM', 'ICE', 'IDXX', 'IEX', 'IFF', 'ILMN', 'INCY', 'INTC', 'INTU', 'IP', 'IPG', 'IQV', 'IR', 'IRM', 'ISRG', 'IT', 'ITW', 'IVZ',
-        'J', 'JBHT', 'JCI', 'JKHY', 'JNJ', 'JNPR', 'JPM', 'JWN',
-        'K', 'KEY', 'KEYS', 'KHC', 'KIM', 'KLAC', 'KMB', 'KMI', 'KMX', 'KO', 'KR',
-        'L', 'LDOS', 'LEN', 'LH', 'LHX', 'LIN', 'LKQ', 'LLY', 'LMT', 'LNC', 'LNT', 'LOW', 'LRCX', 'LUMN', 'LUV', 'LVS', 'LW', 'LYB', 'LYV',
-        'M', 'MA', 'MAA', 'MAR', 'MAS', 'MCD', 'MCHP', 'MCK', 'MCO', 'MDLZ', 'MDT', 'MET', 'META', 'MGM', 'MHK', 'MKC', 'MKTX', 'MLM', 'MMC', 'MMM', 'MNST', 'MO', 'MOH', 'MOS', 'MPC', 'MPWR', 'MRK', 'MRNA', 'MRO', 'MS', 'MSCI', 'MSFT', 'MSI', 'MTB', 'MTCH', 'MTD', 'MU',
-        'NCLH', 'NDAQ', 'NEE', 'NEM', 'NFLX', 'NI', 'NKE', 'NLOK', 'NLSN', 'NOC', 'NOW', 'NRG', 'NSC', 'NTAP', 'NTRS', 'NUE', 'NVDA', 'NVR', 'NWL', 'NWS', 'NWSA',
-        'O', 'ODFL', 'OGN', 'OKE', 'OMC', 'ORCL', 'ORLY', 'OTIS', 'OXY',
-        'PAYX', 'PBCT', 'PCAR', 'PEAK', 'PEG', 'PENN', 'PEP', 'PFE', 'PFG', 'PG', 'PGR', 'PH', 'PHM', 'PKG', 'PKI', 'PLD', 'PM', 'PNC', 'PNR', 'PNW', 'POOL', 'PPG', 'PPL', 'PRU', 'PSA', 'PSX', 'PTC', 'PVH', 'PWR', 'PXD', 'PYPL',
-        'QCOM', 'QRVO',
-        'RCL', 'RE', 'REG', 'REGN', 'RF', 'RHI', 'RJF', 'RL', 'RMD', 'ROK', 'ROL', 'ROP', 'ROST', 'RSG', 'RTX',
-        'SBAC', 'SBUX', 'SCHW', 'SEDG', 'SEE', 'SHW', 'SIVB', 'SJK', 'SLB', 'SNA', 'SNPS', 'SO', 'SPG', 'SPGI', 'SRE', 'STE', 'STT', 'STX', 'STZ', 'SWK', 'SWKS', 'SYK', 'SYY',
-        'T', 'TAP', 'TDG', 'TDY', 'TECH', 'TEL', 'TER', 'TFC', 'TFX', 'TGT', 'TJX', 'TMO', 'TMUS', 'TPR', 'TRMB', 'TROW', 'TRV', 'TSCO', 'TSLA', 'TSN', 'TT', 'TTWO', 'TWTR', 'TXN', 'TXT', 'TYL',
-        'UA', 'UAA', 'UAL', 'UDR', 'UHS', 'ULTA', 'UNH', 'UNP', 'UPS', 'URI', 'USB',
-        'V', 'VFC', 'VLO', 'VMC', 'VNO', 'VRSK', 'VRSN', 'VRTX', 'VTR', 'VTRS', 'VZ',
-        'WAB', 'WAT', 'WBA', 'WBD', 'WDC', 'WEC', 'WELL', 'WFC', 'WHR', 'WM', 'WMB', 'WMT', 'WRB', 'WRK', 'WST', 'WTW', 'WY', 'WYNN',
-        'XEL', 'XOM', 'XRAY', 'XYL',
-        'YUM',
-        'ZBH', 'ZBRA', 'ZION', 'ZTS'
-      ];
-
-      // If it's a known NYSE ticker or length <= 3, assume NYSE as primary guess, else NASDAQ
-      if (nyseList.includes(query) || query.length <= 3) {
-        setCurrentSymbol(`NYSE:${query}`);
-      } else {
-        setCurrentSymbol(`NASDAQ:${query}`);
-      }
-    }
-
+    setCurrentSymbol(query);
     setView('TERMINAL');
     setSearchQuery('');
   };
@@ -748,10 +704,10 @@ export default function App() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={16} />
             <input
               type="text"
-              placeholder="Search ticker (e.g. AAPL, NYSE:IBM)..."
+              placeholder="Search ticker..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2 pl-10 pr-4 text-xs md:text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600 font-medium uppercase"
+              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2 pl-10 pr-4 text-xs md:text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600 font-medium"
             />
           </form>
 
@@ -922,7 +878,7 @@ export default function App() {
 
           <div className="pt-8 border-t border-gray-900 text-center">
             <p className="text-[10px] text-gray-700 font-bold uppercase tracking-[0.4em]">
-              &copy; {new Date().getFullYear()} SIGMATRADER TERMINAL &bull; V3.10.1
+              &copy; {new Date().getFullYear()} SIGMATRADER TERMINAL &bull; V3.10.0
             </p>
           </div>
       </footer>
