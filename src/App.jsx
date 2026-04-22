@@ -30,7 +30,9 @@ import {
   Filter,
   Users,
   LineChart,
-  Eye
+  Eye,
+  BookOpen,
+  Scale
 } from 'lucide-react';
 
 // --- TradingView Widget Components ---
@@ -50,7 +52,7 @@ const TickerTape = () => {
         { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
         { "proName": "COMEX:GC1!", "title": "Gold" },
         { "description": "Apple", "proName": "NASDAQ:AAPL" },
-        { "description": "Oracle", "proName": "NYSE:ORCL" }
+        { "description": "Nvidia", "proName": "NASDAQ:NVDA" }
       ],
       "showSymbolLogo": true,
       "colorTheme": "dark",
@@ -140,6 +142,20 @@ const ScreenerHub = () => {
       tags: ["High Signal", "Filings", "Barchart"]
     },
     {
+      title: "CME FedWatch Tool",
+      description: "Analyze the probabilities of FOMC rate moves based on Fed Funds futures pricing. Critical for macro positioning.",
+      url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
+      icon: <Scale className="text-cyan-400" />,
+      tags: ["Macro", "Interest Rates", "FOMC"]
+    },
+    {
+      title: "Global Economic Calendar",
+      description: "Comprehensive multi-country calendar filtered for medium and high importance volatility events.",
+      url: "https://sslecal2.investing.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=5&calType=week&timeZone=55&lang=1",
+      icon: <CalendarIcon className="text-purple-500" />,
+      tags: ["Volatility", "Global", "Investing.com"]
+    },
+    {
       title: "52-Week Low Large Caps",
       description: "High quality large-cap stocks with positive earnings growth trading near annual lows. Potential value rotation candidates.",
       url: "https://finviz.com/screener.ashx?v=111&f=cap_largeover%2Cfa_div_pos%2Cfa_epsyoy_pos%2Cfa_epsyoy1_pos%2Cta_highlow52w_a0to10h%2Ctargetprice_above&ft=4&o=-marketcap&ar=180&preset=s44313929",
@@ -166,8 +182,8 @@ const ScreenerHub = () => {
     <div className="w-full space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
       <div className="border-b border-gray-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Sigma <span className="text-blue-500">Screener</span> Hub</h2>
-          <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and institutional flow tracking portals.</p>
+          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Intel</span> Hub</h2>
+          <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and professional-grade data pipelines.</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-2xl">
            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
@@ -175,11 +191,11 @@ const ScreenerHub = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {screeners.map((screener, idx) => (
           <div key={idx} className="group bg-gray-900/30 border border-gray-800 p-8 rounded-[2.5rem] hover:border-blue-500/50 transition-all flex flex-col justify-between h-full shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-               {React.cloneElement(screener.icon, { size: 120 })}
+               {React.cloneElement(screener.icon, { size: 100 })}
             </div>
 
             <div className="space-y-6 relative z-10">
@@ -194,8 +210,8 @@ const ScreenerHub = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-xl font-black text-white mb-3 group-hover:text-blue-400 transition-colors">{screener.title}</h3>
-                <p className="text-gray-400 text-xs leading-loose font-medium">
+                <h3 className="text-lg font-black text-white mb-3 group-hover:text-blue-400 transition-colors">{screener.title}</h3>
+                <p className="text-gray-400 text-[11px] leading-relaxed font-medium">
                   {screener.description}
                 </p>
               </div>
@@ -365,7 +381,7 @@ const SavvyTraderPortfolio = () => {
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
           <Award size={12} /> Verified Track Record
         </div>
-        <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500">Sigma</span></h2>
+        <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Swing Trades</span></h2>
         <p className="text-gray-400 max-w-xl mx-auto leading-relaxed text-center">
           SigmaTrader Swing focuses on medium-term trend capture. We share all real-time trade executions and position adjustments through our verified portal.
         </p>
@@ -448,7 +464,8 @@ const SavvyTraderPortfolio = () => {
 export default function App() {
   const [view, setView] = useState('HOME');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentSymbol, setCurrentSymbol] = useState('NYSE:ORCL');
+  // Set default symbol to Apple
+  const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -456,8 +473,9 @@ export default function App() {
     if (!query) return;
     let formatted = query;
     if (!query.includes(':')) {
+        // Simple logic for primary exchanges
         const nyseTickers = ['ORCL', 'IBM', 'GE', 'F', 'T', 'XOM', 'BRK.B', 'WMT', 'JPM'];
-        formatted = nyseTickers.includes(query) ? `NYSE:${query}` : query;
+        formatted = nyseTickers.includes(query) ? `NYSE:${query}` : `NASDAQ:${query}`;
     }
     setCurrentSymbol(formatted);
     setView('TERMINAL');
@@ -496,11 +514,16 @@ export default function App() {
             />
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
              <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Markets</button>
              <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Filter size={14} /> Screener</button>
+             {/* SWAPPED: Portfolio is now before Terminal */}
              <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}><Briefcase size={14} /> Portfolio</button>
              <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>Terminal</button>
+             <div className="w-[1px] h-4 bg-gray-800 mx-2" />
+             <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl text-gray-400 hover:text-blue-400 transition-all flex items-center gap-2">
+                <BookOpen size={14} /> Blog
+             </a>
           </div>
         </div>
       </nav>
@@ -599,7 +622,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-gray-800 bg-black/80 py-4 px-6 flex justify-between items-center text-[9px] text-gray-600 font-bold uppercase tracking-widest">
-          <span>SigmaTrader Terminal Protocol v3.3.0</span>
+          <span>SigmaTrader Terminal Protocol v3.4.0</span>
           <div className="flex gap-4">
             <span className="text-emerald-500/60 flex items-center gap-1"><div className="w-1 h-1 bg-emerald-500 rounded-full" /> Data Synchronized</span>
             <span>&copy; {new Date().getFullYear()}</span>
@@ -607,8 +630,10 @@ export default function App() {
       </footer>
 
       <style dangerouslySetInnerHTML={{ __html: `
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 10px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         @keyframes zoom-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .animate-in { animation: fade-in 0.4s ease-out forwards; }
         .zoom-in { animation: zoom-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
