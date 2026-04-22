@@ -36,7 +36,8 @@ import {
   BookOpen,
   Scale,
   Lock,
-  Unlock
+  Unlock,
+  Menu
 } from 'lucide-react';
 
 // --- Market Status & Dynamic Holiday Component ---
@@ -76,12 +77,10 @@ const MarketStatusBanner = () => {
 
     const formatDate = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-    // Core NYSE Holidays
     const holidays = [
       { name: "New Year's", date: getObservedDate(new Date(currentYear, 0, 1)) },
       { name: "MLK Day", date: getNthWeekday(currentYear, 0, 1, 3) },
       { name: "Presidents", date: getNthWeekday(currentYear, 1, 1, 3) },
-      // Good Friday calculation is complex, using simplified look-up or approximate for UI
       { name: "Good Fri", date: currentYear === 2026 ? new Date(2026, 3, 3) : new Date(2027, 2, 26) },
       { name: "Memorial", date: getLastWeekday(currentYear, 4, 1) },
       { name: "Juneteenth", date: getObservedDate(new Date(currentYear, 5, 19)) },
@@ -595,6 +594,7 @@ export default function App() {
   const [view, setView] = useState('HOME');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -620,52 +620,128 @@ export default function App() {
     { name: 'SEC Filings', url: `https://www.sec.gov/edgar/search/#/category=custom&entityName=${ticker}&forms=10-K%252C10-Q%252C13F-HR`, color: 'bg-red-500/10 text-red-400' }
   ];
 
+  const navigate = (newView) => {
+    setView(newView);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-gray-100 font-sans flex flex-col">
       <TickerTape />
 
       <nav className="sticky top-0 z-50 border-b border-gray-800 bg-[#050505]/95 backdrop-blur-xl">
-        <div className="max-w-full mx-auto px-6 h-16 flex items-center justify-between gap-8">
-          <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => setView('HOME')}>
+        <div className="max-w-full mx-auto px-6 h-16 flex items-center justify-between gap-4 md:gap-8">
+          <div className="flex items-center gap-2 cursor-pointer flex-shrink-0" onClick={() => navigate('HOME')}>
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">Σ</div>
             <span className="text-xl font-black tracking-tight text-white hidden sm:inline">SigmaTrader<span className="text-blue-500">.Net</span></span>
           </div>
 
           <form onSubmit={handleSearch} className="relative group flex-1 max-w-xl">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={18} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={16} />
             <input
               type="text"
-              placeholder="Search ticker (e.g. NVDA, AAPL)..."
+              placeholder="Search ticker..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2.5 pl-12 pr-4 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600 font-medium"
+              className="bg-gray-900/50 border border-gray-800 rounded-2xl py-2 pl-10 pr-4 text-xs md:text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all placeholder:text-gray-600 font-medium"
             />
           </form>
 
-          <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
              <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Home size={14} /> Home
              </button>
-
              <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Filter size={14} /> Screener
              </button>
-
              <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Monitor size={14} /> Terminal
              </button>
-
              <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Briefcase size={14} /> Portfolio
              </button>
-
              <div className="w-[1px] h-4 bg-gray-800 mx-2" />
              <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl text-gray-400 hover:text-blue-400 transition-all flex items-center gap-2">
                 <BookOpen size={14} /> Blog
              </a>
           </div>
+
+          {/* Mobile Menu Trigger */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden p-2.5 bg-gray-900 border border-gray-800 rounded-xl text-gray-400 hover:text-white transition-colors"
+          >
+            <Menu size={20} />
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl animate-in fade-in duration-200">
+           <div className="flex flex-col h-full">
+              <div className="h-16 px-6 flex items-center justify-between border-b border-gray-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">Σ</div>
+                  <span className="text-lg font-black tracking-tight text-white uppercase">Sigma Menu</span>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2.5 bg-gray-900 border border-gray-800 rounded-xl text-gray-400">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                 <button onClick={() => navigate('HOME')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'HOME' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Home size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Market Home</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
+
+                 <button onClick={() => navigate('SCREENER')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'SCREENER' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Filter size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Intel Screener</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
+
+                 <button onClick={() => navigate('TERMINAL')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'TERMINAL' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Monitor size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Stock Terminal</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
+
+                 <button onClick={() => navigate('PORTFOLIO')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'PORTFOLIO' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Briefcase size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Verified Portfolio</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
+
+                 <div className="pt-8 space-y-4">
+                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] pl-2">Resources</p>
+                    <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-6 rounded-3xl bg-gray-900/20 border border-gray-800 text-gray-400">
+                      <div className="flex items-center gap-4">
+                         <BookOpen size={24} />
+                         <span className="font-black uppercase tracking-widest text-sm">Research Blog</span>
+                      </div>
+                      <ExternalLink size={16} />
+                    </a>
+                 </div>
+              </div>
+
+              <div className="p-8 border-t border-gray-800 text-center">
+                 <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader.Net Mobile</p>
+              </div>
+           </div>
+        </div>
+      )}
 
       <main className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-900/10 to-black">
         <div className="w-full px-6 py-8">
@@ -683,7 +759,7 @@ export default function App() {
                   </div>
                </div>
                <div className="space-y-4">
-                  <div className="flex items-center justify-between px-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-2">
                     <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
                       <Activity size={14} className="text-cyan-500" /> S&P 500 Sector Performance
                     </h3>
@@ -717,14 +793,14 @@ export default function App() {
             <div className="space-y-8 animate-in fade-in duration-500">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-gray-800">
                 <div>
-                  <h1 className="text-4xl font-black text-white tracking-tighter flex items-center gap-3">
-                    {ticker} <span className="text-lg font-medium text-gray-500">{currentSymbol.split(':')[0]}</span>
+                  <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter flex items-center gap-3">
+                    {ticker} <span className="text-sm md:text-lg font-medium text-gray-500">{currentSymbol.split(':')[0]}</span>
                   </h1>
                   <p className="text-blue-500 text-[10px] mt-1 uppercase font-black tracking-[0.3em]">Institutional Grade Terminal</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {externalLinks.map(link => (
-                    <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className={`px-4 py-2 rounded-xl border border-white/5 flex items-center gap-2 text-[11px] font-black transition-all hover:bg-white/5 ${link.color}`}>
+                    <a key={link.name} href={link.url} target="_blank" rel="noopener noreferrer" className={`px-3 py-2 rounded-xl border border-white/5 flex items-center gap-2 text-[10px] md:text-[11px] font-black transition-all hover:bg-white/5 ${link.color}`}>
                       {link.name} <ExternalLink size={12} />
                     </a>
                   ))}
@@ -747,7 +823,7 @@ export default function App() {
       </main>
 
       <footer className="border-t border-gray-800 bg-black/80 py-6 px-6 text-center">
-          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader Terminal v3.8.0 &bull; Dynamic Logic Active</p>
+          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader Terminal v3.9.0 &bull; Mobile Enhanced</p>
       </footer>
     </div>
   );
