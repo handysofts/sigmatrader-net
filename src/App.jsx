@@ -37,7 +37,12 @@ import {
   Scale,
   Lock,
   Unlock,
-  Menu
+  Menu,
+  Landmark,
+  MessageSquare,
+  Twitter,
+  Github,
+  Send
 } from 'lucide-react';
 
 // --- Market Status & Dynamic Holiday Component ---
@@ -46,7 +51,6 @@ const MarketStatusBanner = () => {
   const [status, setStatus] = useState({ isOpen: false, message: 'Calculating...', nextEvent: '' });
   const currentYear = new Date().getFullYear();
 
-  // Dynamic Holiday Calculation Logic
   const holidaySchedule = useMemo(() => {
     const getNthWeekday = (year, month, dayOfWeek, n) => {
       let date = new Date(year, month, 1);
@@ -70,8 +74,8 @@ const MarketStatusBanner = () => {
 
     const getObservedDate = (date) => {
       const d = new Date(date);
-      if (d.getDay() === 0) d.setDate(d.getDate() + 1); // Sunday -> Monday
-      if (d.getDay() === 6) d.setDate(d.getDate() - 1); // Saturday -> Friday
+      if (d.getDay() === 0) d.setDate(d.getDate() + 1);
+      if (d.getDay() === 6) d.setDate(d.getDate() - 1);
       return d;
     };
 
@@ -159,6 +163,114 @@ const MarketStatusBanner = () => {
                 <p className="text-[9px] font-bold text-gray-500">{holiday.date}</p>
              </div>
            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Macro Data Components (FRED) ---
+
+const FredChart = ({ url, title }) => {
+    return (
+        <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between mb-3 px-2">
+                <h4 className="text-[11px] font-black text-gray-400 uppercase tracking-[0.15em]">{title}</h4>
+                <div className="flex items-center gap-2">
+                   <span className="text-[8px] text-gray-600 font-bold uppercase">Fluid Width</span>
+                   <Landmark size={14} className="text-gray-600" />
+                </div>
+            </div>
+            <div className="flex-1 bg-gray-900/60 rounded-[2.5rem] border border-gray-800 overflow-hidden relative group min-h-[600px]">
+                <iframe
+                    src={url}
+                    className="w-full h-full border-none filter grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                    scrolling="no"
+                    style={{ width: '100%', height: '100%' }}
+                />
+                <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[2.5rem] shadow-inner" />
+            </div>
+        </div>
+    );
+};
+
+const MacroSection = () => {
+    const macroData = [
+        { title: "CPI (Inflation)", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1k6gW&width=100%&height=800" },
+        { title: "Unemployment Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1jGaT&width=100%&height=800" },
+        { title: "Fed Funds Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1n07T&width=100%&height=800" },
+        { title: "Real GDP Growth", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1lk6a&width=100%&height=800" }
+    ];
+
+    return (
+        <div className="space-y-8 pt-12 mt-12 border-t border-gray-800/50">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                    <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Scale size={18} className="text-indigo-500" /> Macro Economic Benchmarks
+                    </h3>
+                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Source: Federal Reserve Economic Data (FRED) • High-Fidelity Views</p>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-10">
+                {macroData.map((item, i) => (
+                    <FredChart key={i} title={item.title} url={item.url} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// --- Contact Components ---
+
+const ContactIntelligence = () => {
+  return (
+    <div className="w-full pt-16 mt-16 border-t border-gray-800/50">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gradient-to-br from-blue-600/10 to-indigo-600/10 border border-blue-500/20 rounded-[3rem] p-8 md:p-12 relative overflow-hidden group">
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="flex-1 text-center md:text-left space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
+                <MessageSquare size={12} /> Contact Us
+              </div>
+              <h3 className="text-3xl font-black text-white tracking-tight">Direct Intelligence <span className="text-blue-500 text-nowrap">Lines</span></h3>
+              <p className="text-gray-400 text-sm leading-relaxed max-w-md">
+                Have questions about our swing trading methodology or terminal features? Our research team is available for direct inquiries.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-4 w-full md:w-auto">
+              <a
+                href="mailto:contact@sigmatrader.net"
+                className="flex items-center justify-between gap-6 px-8 py-5 bg-gray-900 border border-gray-800 hover:border-blue-500/50 hover:bg-gray-800/50 rounded-2xl transition-all group/mail"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover/mail:scale-110 transition-transform">
+                    <Mail size={20} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Email Enquiries</p>
+                    <p className="text-sm font-bold text-white">contact@sigmatrader.net</p>
+                  </div>
+                </div>
+                <ArrowUpRight size={18} className="text-gray-600 group-hover/mail:text-blue-500 transition-colors" />
+              </a>
+
+              <div className="flex gap-4">
+                <button className="flex-1 flex items-center justify-center gap-2 p-4 bg-gray-900 border border-gray-800 rounded-2xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all">
+                  <Twitter size={18} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Twitter</span>
+                </button>
+                <button className="flex-1 flex items-center justify-center gap-2 p-4 bg-gray-900 border border-gray-800 rounded-2xl text-gray-400 hover:text-white hover:bg-gray-800/50 transition-all">
+                  <Github size={18} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">GitHub</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -315,10 +427,6 @@ const ScreenerHub = () => {
           <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Intel</span> Hub</h2>
           <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and professional-grade data pipelines.</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 border border-gray-800 rounded-2xl">
-           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-           <span className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Live Data Pipelines Active</span>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -359,18 +467,6 @@ const ScreenerHub = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="bg-blue-600/5 border border-blue-600/10 rounded-[2.5rem] p-8 flex items-center gap-6">
-        <div className="hidden sm:block p-4 bg-blue-600/20 rounded-full">
-          <Database className="text-blue-400" size={24} />
-        </div>
-        <div>
-          <h4 className="text-sm font-black text-white uppercase tracking-wider">Dynamic Feed Notification</h4>
-          <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-            These screeners and macro tools are refreshed in real-time. SigmaTrader.Net provides direct deep-links to ensure you are accessing the latest market data without proxy delays.
-          </p>
-        </div>
       </div>
     </div>
   );
@@ -511,9 +607,6 @@ const SavvyTraderPortfolio = () => {
           <Award size={12} /> Verified Track Record
         </div>
         <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Swing Trades</span></h2>
-        <p className="text-gray-400 max-w-xl mx-auto leading-relaxed text-center">
-          SigmaTrader Swing focuses on medium-term trend capture. We share all real-time trade executions and position adjustments through our verified portal.
-        </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -558,30 +651,6 @@ const SavvyTraderPortfolio = () => {
               Share QR
             </button>
           </div>
-
-          <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest flex items-center gap-4">
-            <span className="flex items-center gap-1"><ShieldCheck size={12} /> SECURE REDIRECT</span>
-            <span className="flex items-center gap-1"><Activity size={12} /> REAL-TIME SYNC</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-900/20 border border-gray-800/50 p-8 rounded-[2.5rem]">
-          <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 text-center md:text-left">Strategy Methodology</h4>
-          <p className="text-xs text-gray-400 leading-loose italic text-center md:text-left">
-            "The SigmaTrader Swing methodology captures multi-week trends in high-liquidity tech assets. By combining quantitative RSI-based oscillators with fundamental catalyst identification, we aim to enter positions before major institutional rotations."
-          </p>
-        </div>
-
-        <div className="bg-red-500/5 border border-red-500/10 p-8 rounded-[2.5rem] flex flex-col justify-center items-center md:items-start">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={14} className="text-red-500" />
-            <h4 className="text-[10px] font-black text-red-500 uppercase tracking-widest">Financial Disclaimer</h4>
-          </div>
-          <p className="text-[11px] text-gray-500 leading-relaxed font-medium text-center md:text-left">
-            This content is for informational purposes only and not financial advice. Trading securities involves risk. Past performance is not indicative of future results. SigmaTrader is not a registered financial advisor.
-          </p>
         </div>
       </div>
     </div>
@@ -647,7 +716,6 @@ export default function App() {
             />
           </form>
 
-          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
              <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Home size={14} /> Home
@@ -661,13 +729,8 @@ export default function App() {
              <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Briefcase size={14} /> Portfolio
              </button>
-             <div className="w-[1px] h-4 bg-gray-800 mx-2" />
-             <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl text-gray-400 hover:text-blue-400 transition-all flex items-center gap-2">
-                <BookOpen size={14} /> Blog
-             </a>
           </div>
 
-          {/* Mobile Menu Trigger */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
             className="lg:hidden p-2.5 bg-gray-900 border border-gray-800 rounded-xl text-gray-400 hover:text-white transition-colors"
@@ -677,7 +740,6 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl animate-in fade-in duration-200">
            <div className="flex flex-col h-full">
@@ -699,15 +761,6 @@ export default function App() {
                     </div>
                     <ChevronRight size={18} />
                  </button>
-
-                 <button onClick={() => navigate('SCREENER')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'SCREENER' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
-                    <div className="flex items-center gap-4">
-                       <Filter size={24} />
-                       <span className="font-black uppercase tracking-widest text-sm">Intel Screener</span>
-                    </div>
-                    <ChevronRight size={18} />
-                 </button>
-
                  <button onClick={() => navigate('TERMINAL')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'TERMINAL' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
                     <div className="flex items-center gap-4">
                        <Monitor size={24} />
@@ -715,29 +768,6 @@ export default function App() {
                     </div>
                     <ChevronRight size={18} />
                  </button>
-
-                 <button onClick={() => navigate('PORTFOLIO')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'PORTFOLIO' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
-                    <div className="flex items-center gap-4">
-                       <Briefcase size={24} />
-                       <span className="font-black uppercase tracking-widest text-sm">Verified Portfolio</span>
-                    </div>
-                    <ChevronRight size={18} />
-                 </button>
-
-                 <div className="pt-8 space-y-4">
-                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] pl-2">Resources</p>
-                    <a href="https://blog.sigmatrader.net/" target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-between p-6 rounded-3xl bg-gray-900/20 border border-gray-800 text-gray-400">
-                      <div className="flex items-center gap-4">
-                         <BookOpen size={24} />
-                         <span className="font-black uppercase tracking-widest text-sm">Research Blog</span>
-                      </div>
-                      <ExternalLink size={16} />
-                    </a>
-                 </div>
-              </div>
-
-              <div className="p-8 border-t border-gray-800 text-center">
-                 <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader.Net Mobile</p>
               </div>
            </div>
         </div>
@@ -748,36 +778,30 @@ export default function App() {
           {view === 'HOME' && (
             <div className="max-w-[1600px] mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                <MarketStatusBanner />
+
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   <div className="space-y-4">
                     <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><TrendingUp size={14} className="text-blue-500" /> Market Benchmarks</h3>
                     <MarketOverviewWidget />
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Econ Events (Med/High Impact)</h3>
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Econ Events</h3>
                     <EconomicCalendar />
                   </div>
                </div>
+
                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-2 gap-2">
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                      <Activity size={14} className="text-cyan-500" /> S&P 500 Sector Performance
-                    </h3>
-                    <a
-                      href="https://www.tradingview.com/heatmap/stock/#%7B%22dataSource%22%3A%22SPX500%22%2C%22blockColor%22%3A%22change%22%2C%22blockSize%22%3A%22market_cap_basic%22%2C%22grouping%22%3A%22sector%22%7D"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[9px] font-black uppercase tracking-widest text-blue-500 hover:text-blue-400 flex items-center gap-1.5 transition-colors group"
-                    >
-                      Expand to TradingView <ExternalLink size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </a>
-                  </div>
                   <MarketHeatmap />
                </div>
+
                <div className="space-y-4">
-                  <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><CalendarIcon size={14} className="text-blue-500" /> Popular Earnings Week</h3>
                   <EarningsHubWidget />
                </div>
+
+               <MacroSection />
+
+               {/* New Contact Section */}
+               <ContactIntelligence />
             </div>
           )}
 
@@ -796,7 +820,6 @@ export default function App() {
                   <h1 className="text-3xl md:text-4xl font-black text-white tracking-tighter flex items-center gap-3">
                     {ticker} <span className="text-sm md:text-lg font-medium text-gray-500">{currentSymbol.split(':')[0]}</span>
                   </h1>
-                  <p className="text-blue-500 text-[10px] mt-1 uppercase font-black tracking-[0.3em]">Institutional Grade Terminal</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {externalLinks.map(link => (
@@ -822,8 +845,47 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="border-t border-gray-800 bg-black/80 py-6 px-6 text-center">
-          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.4em]">SigmaTrader Terminal v3.9.0 &bull; Mobile Enhanced</p>
+      <footer className="border-t border-gray-800 bg-gray-950 pt-16 pb-8 px-6">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
+            <div className="space-y-6">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20">Σ</div>
+                <span className="text-xl font-black tracking-tight text-white">SigmaTrader<span className="text-blue-500">.Net</span></span>
+              </div>
+              <p className="text-gray-500 text-xs leading-relaxed max-w-xs">
+                Quantitative trading terminal and macro intelligence for institutional-grade market analysis.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Connect</p>
+              <ul className="space-y-3">
+                <li>
+                  <a href="mailto:contact@sigmatrader.net" className="text-sm text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                    <Mail size={14} className="group-hover:translate-x-1 transition-transform"/> contact@sigmatrader.net
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
+                    <Twitter size={14} className="group-hover:translate-x-1 transition-transform"/> @SigmaTraderNet
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Compliance</p>
+              <p className="text-[10px] text-gray-600 leading-relaxed font-medium">
+                Information provided is for educational purposes only. Investing involves risk. SigmaTrader is not a registered investment advisor.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-gray-900 text-center">
+            <p className="text-[10px] text-gray-700 font-bold uppercase tracking-[0.4em]">
+              &copy; {new Date().getFullYear()} SIGMATRADER TERMINAL &bull; V3.10.0
+            </p>
+          </div>
       </footer>
     </div>
   );
