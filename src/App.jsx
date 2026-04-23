@@ -327,6 +327,14 @@ const MarketStatusBanner = () => {
           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
             <CalendarIcon size={12} /> NYSE / NASDAQ HOLIDAYS {currentYear}
           </h4>
+          <span className="text-[9px] font-bold text-green-500 bg-green-500/10 px-2 py-0.5 rounded uppercase tracking-widest">
+            {new Date().toLocaleDateString('en-GB', {
+              weekday: 'short',
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
