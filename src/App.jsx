@@ -410,7 +410,7 @@ const ScreenerHub = () => {
     <div className="w-full space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
       <div className="border-b border-gray-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Intel</span> Hub</h2>
+          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Screener</span></h2>
           <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and professional-grade data pipelines.</p>
         </div>
       </div>
@@ -747,10 +747,24 @@ export default function App() {
                     </div>
                     <ChevronRight size={18} />
                  </button>
+                 <button onClick={() => navigate('SCREENER')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'SCREENER' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Monitor size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Screener Hub</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
                  <button onClick={() => navigate('TERMINAL')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'TERMINAL' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
                     <div className="flex items-center gap-4">
                        <Monitor size={24} />
                        <span className="font-black uppercase tracking-widest text-sm">Stock Terminal</span>
+                    </div>
+                    <ChevronRight size={18} />
+                 </button>
+                 <button onClick={() => navigate('PORTFOLIO')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'PORTFOLIO' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
+                    <div className="flex items-center gap-4">
+                       <Monitor size={24} />
+                       <span className="font-black uppercase tracking-widest text-sm">Portfolio</span>
                     </div>
                     <ChevronRight size={18} />
                  </button>
@@ -771,7 +785,7 @@ export default function App() {
                     <MarketOverviewWidget />
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Econ Events</h3>
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Economic Events</h3>
                     <EconomicCalendar />
                   </div>
                </div>
