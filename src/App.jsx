@@ -351,12 +351,6 @@ const MarketStatusBanner = () => {
                 }`}>
                   {holiday.formatted}
                 </p>
-
-                {isNext && (
-                  <p className="text-[8px] text-blue-400 mt-1 uppercase">
-                    Next
-                  </p>
-                )}
               </div>
             );
           })}
