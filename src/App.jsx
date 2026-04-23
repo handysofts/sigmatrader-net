@@ -152,13 +152,13 @@ const MarketStatusBanner = () => {
            <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
              <CalendarIcon size={12} /> NYSE / NASDAQ HOLIDAYS {currentYear}
            </h4>
-           <span className="text-[8px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-widest">Auto-Updating Calendar</span>
+           <span className="text-[8px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-widest">Calendar</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative z-10">
            {holidaySchedule.map((holiday, i) => (
              <div key={i} className="bg-white/5 border border-white/5 p-2 rounded-xl text-center hover:bg-white/10 transition-all">
-                <p className="text-[8px] font-black text-white truncate uppercase">{holiday.name}</p>
-                <p className="text-[9px] font-bold text-gray-500">{holiday.date}</p>
+                <p className="text-[9px] font-black text-white truncate uppercase">{holiday.name}</p>
+                <p className="text-[11px] font-bold text-gray-500">{holiday.date}</p>
              </div>
            ))}
         </div>
@@ -183,8 +183,9 @@ const FredChart = ({ url, title }) => {
                 <iframe
                     src={url}
                     className="w-full h-full border-none filter grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-                    scrolling="no"
+                    scrolling="no" frameborder="0"
                     style={{ width: '100%', height: '100%' }}
+                    allowTransparency="true" loading="lazy"
                 />
                 <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[2.5rem] shadow-inner" />
             </div>
@@ -194,10 +195,10 @@ const FredChart = ({ url, title }) => {
 
 const MacroSection = () => {
     const macroData = [
-        { title: "CPI (Inflation)", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1k6gW&width=100%&height=800" },
-        { title: "Unemployment Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1jGaT&width=100%&height=800" },
-        { title: "Fed Funds Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1n07T&width=100%&height=800" },
-        { title: "Real GDP Growth", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1lk6a&width=100%&height=800" }
+        { title: "CPI (Inflation)", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1k6gW&width=100%&height=570" },
+        { title: "Unemployment Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1jGaT&width=100%&height=570" },
+        { title: "Fed Funds Rate", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1n07T&width=100%&height=570" },
+        { title: "Real GDP Growth", url: "https://fred.stlouisfed.org/graph/graph-landing.php?g=1lk6a&width=100%&height=570" }
     ];
 
     return (
@@ -277,10 +278,9 @@ const TickerTape = () => {
       "symbols": [
         { "proName": "FOREXCOM:SPX500", "title": "S&P 500" },
         { "proName": "FOREXCOM:NSXUSD", "title": "Nasdaq 100" },
-        { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
-        { "proName": "COMEX:GC1!", "title": "Gold" },
-        { "description": "Apple", "proName": "NASDAQ:AAPL" },
-        { "description": "Nvidia", "proName": "NASDAQ:NVDA" }
+        { "proName": "COINBASE:BTCUSD", "title": "Bitcoin" },
+        { "proName": "TVC:GOLD", "title": "Gold" },
+        { "proName": "TVC:USOIL", "title": "OIL" }
       ],
       "showSymbolLogo": true,
       "colorTheme": "dark",
@@ -487,7 +487,24 @@ const MarketOverviewWidget = () => {
     script.async = true;
     script.innerHTML = JSON.stringify({
       "colorTheme": "dark", "dateRange": "12M", "showChart": true, "locale": "en", "isTransparent": true, "showSymbolLogo": true, "width": "100%", "height": "100%",
-      "tabs": [{ "title": "Indices", "symbols": [{ "s": "FOREXCOM:SPX500", "d": "S&P 500" }, { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" }, { "s": "FOREXCOM:DJI", "d": "Dow 30" }] }]
+      "tabs": [
+        {
+          "title": "Indices",
+          "symbols": [
+            { "s": "FOREXCOM:SPX500", "d": "S&P 500" },
+            { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
+            { "s": "FOREXCOM:DJI", "d": "Dow 30" }
+          ]
+        },
+        {
+          "title": "Commodities & Crypto",
+          "symbols": [
+            { "s": "COINBASE:BTCUSD", "d": "Bitcoin" },
+            { "s": "TVC:GOLD", "d": "Gold" },
+            { "s": "TVC:USOIL", "d": "Oil (WTI)" }
+          ]
+        }
+      ]
     });
     container.current.appendChild(script);
   }, []);
