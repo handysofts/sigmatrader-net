@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import ReactGA from "react-ga4";
 import {
   Search,
   Home,
@@ -17,6 +18,7 @@ import {
   PieChart,
   Gauge,
   Zap,
+  Moon,
   Clock,
   Briefcase,
   ExternalLink,
@@ -44,12 +46,17 @@ import {
 } from 'lucide-react';
 
 // --- Market Status & Dynamic Holiday Component ---
-
 const MarketStatusBanner = () => {
-  const [status, setStatus] = useState({ isOpen: false, message: 'Calculating...', nextEvent: '' });
+  const [status, setStatus] = useState({
+    isOpen: false,
+    message: 'Calculating...',
+    nextEvent: ''
+  });
+
   const currentYear = new Date().getFullYear();
 
   const holidaySchedule = useMemo(() => {
+
     const getNthWeekday = (year, month, dayOfWeek, n) => {
       let date = new Date(year, month, 1);
       let count = 0;
@@ -77,13 +84,38 @@ const MarketStatusBanner = () => {
       return d;
     };
 
-    const formatDate = (d) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const formatDate = (d) =>
+      d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    // 🔥 Easter calculation (for Good Friday)
+    const getEasterSunday = (year) => {
+      const a = year % 19;
+      const b = Math.floor(year / 100);
+      const c = year % 100;
+      const d = Math.floor(b / 4);
+      const e = b % 4;
+      const f = Math.floor((b + 8) / 25);
+      const g = Math.floor((b - f + 1) / 3);
+      const h = (19 * a + b - d - g + 15) % 30;
+      const i = Math.floor(c / 4);
+      const k = c % 4;
+      const l = (32 + 2 * e + 2 * i - h - k) % 7;
+      const m = Math.floor((a + 11 * h + 22 * l) / 451);
+      const month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+      const day = ((h + l - 7 * m + 114) % 31) + 1;
+
+      return new Date(year, month, day);
+    };
+
+    const easter = getEasterSunday(currentYear);
+    const goodFriday = new Date(easter);
+    goodFriday.setDate(easter.getDate() - 2);
 
     const holidays = [
       { name: "New Year's", date: getObservedDate(new Date(currentYear, 0, 1)) },
       { name: "MLK Day", date: getNthWeekday(currentYear, 0, 1, 3) },
       { name: "Presidents", date: getNthWeekday(currentYear, 1, 1, 3) },
-      { name: "Good Fri", date: currentYear === 2026 ? new Date(2026, 3, 3) : new Date(2027, 2, 26) },
+      { name: "Good Fri", date: goodFriday },
       { name: "Memorial", date: getLastWeekday(currentYear, 4, 1) },
       { name: "Juneteenth", date: getObservedDate(new Date(currentYear, 5, 19)) },
       { name: "July 4th", date: getObservedDate(new Date(currentYear, 6, 4)) },
@@ -92,13 +124,53 @@ const MarketStatusBanner = () => {
       { name: "Christmas", date: getObservedDate(new Date(currentYear, 11, 25)) },
     ];
 
-    return holidays.map(h => ({ name: h.name, date: formatDate(h.date) }));
+    return holidays
+      .sort((a, b) => a.date - b.date)
+      .map(h => ({
+        name: h.name,
+        date: h.date,
+        formatted: formatDate(h.date)
+      }));
+
   }, [currentYear]);
 
+  // ✅ Find next holiday
+  const nextHolidayIndex = useMemo(() => {
+    const now = new Date();
+
+    return holidaySchedule
+      .map((h, i) => ({ ...h, i }))
+      .filter(h => h.date >= now)
+      .sort((a, b) => a.date - b.date)[0]?.i ?? -1;
+
+  }, [holidaySchedule]);
+
+  // ✅ Market status (extended with next holiday info)
   useEffect(() => {
+      const isSameDayEST = (date1, date2) => {
+        const toEST = (d) =>
+          new Date(
+            new Intl.DateTimeFormat('en-US', {
+              timeZone: 'America/New_York',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(d)
+          );
+
+        const d1 = toEST(date1);
+        const d2 = toEST(date2);
+
+        return (
+          d1.getFullYear() === d2.getFullYear() &&
+          d1.getMonth() === d2.getMonth() &&
+          d1.getDate() === d2.getDate()
+        );
+      };
     const checkMarketStatus = () => {
       const now = new Date();
-      const estTime = new Intl.DateTimeFormat('en-US', {
+
+      const parts = new Intl.DateTimeFormat('en-US', {
         timeZone: 'America/New_York',
         hour: 'numeric',
         minute: 'numeric',
@@ -106,62 +178,190 @@ const MarketStatusBanner = () => {
         weekday: 'short'
       }).formatToParts(now);
 
-      const weekday = estTime.find(p => p.type === 'weekday').value;
-      const hour = parseInt(estTime.find(p => p.type === 'hour').value);
-      const minute = parseInt(estTime.find(p => p.type === 'minute').value);
+      const weekday = parts.find(p => p.type === 'weekday').value;
+      const hour = parseInt(parts.find(p => p.type === 'hour').value);
+      const minute = parseInt(parts.find(p => p.type === 'minute').value);
 
       const isWeekend = weekday === 'Sat' || weekday === 'Sun';
-      const isWorkHours = (hour === 9 && minute >= 30) || (hour > 9 && hour < 16);
 
-      if (isWeekend) {
-        setStatus({ isOpen: false, message: 'Market Closed', nextEvent: 'Opens Monday 9:30 AM EST' });
-      } else if (isWorkHours) {
-        setStatus({ isOpen: true, message: 'Market Open', nextEvent: 'Closes at 4:00 PM EST' });
-      } else {
-        setStatus({ isOpen: false, message: 'Market Closed', nextEvent: hour >= 16 ? 'Opens Tomorrow 9:30 AM EST' : 'Opens Today 9:30 AM EST' });
+      // 🕒 Time windows (EST)
+      const isPremarket =
+        (hour >= 4 && hour < 9) || (hour === 9 && minute < 30);
+
+      const isRegular =
+        (hour === 9 && minute >= 30) || (hour > 9 && hour < 16);
+
+      const isAfterHours =
+        (hour >= 16 && hour < 20);
+
+      // 📅 Today holiday check
+      const todayHoliday = holidaySchedule.find(h =>
+        isSameDayEST(h.date, now)
+      );
+
+      // 🔮 Next holiday info
+      let nextEventText = '';
+      if (nextHolidayIndex !== -1) {
+        const nextHoliday = holidaySchedule[nextHolidayIndex];
+        const days = Math.ceil(
+          (nextHoliday.date - now) / (1000 * 60 * 60 * 24)
+        );
+
+        nextEventText = `Next Holiday: ${nextHoliday.name} (${nextHoliday.formatted}) in ${days}d`;
       }
+
+      // 🚨 HOLIDAY OVERRIDE
+      if (todayHoliday) {
+        setStatus({
+          isOpen: false,
+          message: 'Market Closed',
+          nextEvent: `Closed for ${todayHoliday.name}`
+        });
+        return;
+      }
+
+      // 🚨 WEEKEND
+      if (isWeekend) {
+        setStatus({
+          isOpen: false,
+          message: 'Market Closed',
+          nextEvent: nextEventText || 'Opens Monday 4:00 AM EST (Premarket)'
+        });
+        return;
+      }
+
+      // 🟡 PREMARKET
+      if (isPremarket) {
+        setStatus({
+          isOpen: true,
+          message: 'Premarket',
+          nextEvent: nextEventText || 'Regular opens 9:30 AM EST'
+        });
+        return;
+      }
+
+      // 🟢 REGULAR HOURS
+      if (isRegular) {
+        setStatus({
+          isOpen: true,
+          message: 'Market Open',
+          nextEvent: nextEventText || 'Closes at 4:00 PM EST'
+        });
+        return;
+      }
+
+      // 🔵 AFTER HOURS
+      if (isAfterHours) {
+        setStatus({
+          isOpen: true,
+          message: 'After Hours',
+          nextEvent: nextEventText || 'Closes at 8:00 PM EST'
+        });
+        return;
+      }
+
+      // ⚫ NIGHT (fully closed)
+      setStatus({
+        isOpen: false,
+        message: 'Market Closed',
+        nextEvent: nextEventText || 'Opens 4:00 AM EST (Premarket)'
+      });
     };
 
     checkMarketStatus();
     const interval = setInterval(checkMarketStatus, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [holidaySchedule, nextHolidayIndex]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+      {/* LEFT PANEL */}
       <div className="bg-gray-900/40 border border-gray-800 p-6 rounded-[2rem] flex flex-col justify-between shadow-xl backdrop-blur-sm">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Exchange Status</p>
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              Exchange Status
+            </p>
             <h4 className="text-2xl font-black text-white flex items-center gap-2">
-              {status.isOpen ? <Unlock className="text-emerald-500" size={20} /> : <Lock className="text-red-500" size={20} />}
+              {status.message === 'Market Open' && (
+                <Unlock className="text-emerald-500" size={20} />
+              )}
+
+              {status.message === 'Market Closed' && (
+                <Lock className="text-red-500" size={20} />
+              )}
+
+              {status.message === 'Premarket' && (
+                <Zap className="text-yellow-400" size={20} />
+              )}
+
+              {status.message === 'After Hours' && (
+                <Moon className="text-blue-400" size={20} />
+              )}
+
               {status.message}
             </h4>
           </div>
-          <div className={`px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-tighter ${status.isOpen ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+
+          <div className={`px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-tighter ${
+            status.isOpen
+              ? 'bg-emerald-500/10 text-emerald-500'
+              : 'bg-red-500/10 text-red-500'
+          }`}>
             Live Feed
           </div>
         </div>
+
         <div className="mt-4 pt-4 border-t border-gray-800/50">
-           <p className="text-[11px] text-gray-400 font-medium flex items-center gap-2"><Clock size={12}/> {status.nextEvent}</p>
+          <p className="text-[11px] text-gray-400 font-medium flex items-center gap-2">
+            <Clock size={12}/> {status.nextEvent}
+          </p>
         </div>
       </div>
 
-      <div className="md:col-span-2 bg-gray-900/40 border border-gray-800 p-6 rounded-[2rem] shadow-xl backdrop-blur-sm relative overflow-hidden">
-        <div className="flex items-center justify-between mb-4 relative z-10">
-           <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
-             <CalendarIcon size={12} /> NYSE / NASDAQ HOLIDAYS {currentYear}
-           </h4>
-           <span className="text-[8px] font-bold text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded uppercase tracking-widest">Calendar</span>
+      {/* HOLIDAY PANEL */}
+      <div className="md:col-span-2 bg-gray-900/40 border border-gray-800 p-6 rounded-[2rem] shadow-xl backdrop-blur-sm">
+
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+            <CalendarIcon size={12} /> NYSE / NASDAQ HOLIDAYS {currentYear}
+          </h4>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 relative z-10">
-           {holidaySchedule.map((holiday, i) => (
-             <div key={i} className="bg-white/5 border border-white/5 p-2 rounded-xl text-center hover:bg-white/10 transition-all">
-                <p className="text-[9px] font-black text-white truncate uppercase">{holiday.name}</p>
-                <p className="text-[11px] font-bold text-gray-500">{holiday.date}</p>
-             </div>
-           ))}
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          {holidaySchedule.map((holiday, i) => {
+            const isNext = i === nextHolidayIndex;
+
+            return (
+              <div
+                key={i}
+                className={`p-2 rounded-xl text-center transition-all border ${
+                  isNext
+                    ? 'bg-blue-500/20 border-blue-500 scale-105'
+                    : 'bg-white/5 border-white/5 hover:bg-white/10'
+                }`}
+              >
+                <p className="text-[9px] font-black text-white truncate uppercase">
+                  {holiday.name}
+                </p>
+
+                <p className={`text-[11px] font-bold ${
+                  isNext ? 'text-blue-400' : 'text-gray-500'
+                }`}>
+                  {holiday.formatted}
+                </p>
+
+                {isNext && (
+                  <p className="text-[8px] text-blue-400 mt-1 uppercase">
+                    Next
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
+
       </div>
     </div>
   );
@@ -363,25 +563,11 @@ const CompanyProfile = ({ symbol }) => {
 const ScreenerHub = () => {
   const screeners = [
     {
-      title: "Insider Trading Activity",
-      description: "Follow the 'Smart Money' with Barchart's real-time tracker of corporate officers and directors buying their own stock.",
-      url: "https://www.barchart.com/investing-ideas/insider-trading-activity",
-      icon: <Eye className="text-red-500" />,
-      tags: ["High Signal", "Filings", "Barchart"]
-    },
-    {
-      title: "CME FedWatch Tool",
-      description: "Analyze the probabilities of FOMC rate moves based on Fed Funds futures pricing. Critical for macro positioning.",
-      url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
-      icon: <Scale className="text-cyan-400" />,
-      tags: ["Macro", "Interest Rates", "FOMC"]
-    },
-    {
-      title: "Global Economic Calendar",
-      description: "Comprehensive multi-country calendar filtered for medium and high importance volatility events.",
-      url: "https://sslecal2.investing.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=5&calType=week&timeZone=55&lang=1",
-      icon: <CalendarIcon className="text-purple-500" />,
-      tags: ["Volatility", "Global", "Investing.com"]
+      title: "Institutional Insider Buys",
+      description: "Real-time tracking of transaction values over $100k where C-suite executives are increasing their personal stakes.",
+      url: "https://finviz.com/insidertrading?or=-10&tv=100000&tc=1&o=-transactionValue",
+      icon: <Users className="text-emerald-500" />,
+      tags: ["Insider", "High Conviction", "Finviz"]
     },
     {
       title: "52-Week Low Large Caps",
@@ -391,11 +577,11 @@ const ScreenerHub = () => {
       tags: ["Large Cap", "Value", "52W Low"]
     },
     {
-      title: "Institutional Insider Buys",
-      description: "Real-time tracking of transaction values over $100k where C-suite executives are increasing their personal stakes.",
-      url: "https://finviz.com/insidertrading?or=-10&tv=100000&tc=1&o=-transactionValue",
-      icon: <Users className="text-emerald-500" />,
-      tags: ["Insider", "High Conviction", "Finviz"]
+      title: "Insider Trading Activity",
+      description: "Follow the 'Smart Money' with Barchart's real-time tracker of corporate officers and directors buying their own stock.",
+      url: "https://www.barchart.com/investing-ideas/insider-trading-activity",
+      icon: <Eye className="text-red-500" />,
+      tags: ["High Signal", "Filings", "Barchart"]
     },
     {
       title: "Current Market Valuation",
@@ -403,6 +589,20 @@ const ScreenerHub = () => {
       url: "https://www.currentmarketvaluation.com/",
       icon: <LineChart className="text-amber-500" />,
       tags: ["Macro", "Valuation", "Risk"]
+    },
+     {
+       title: "Global Economic Calendar",
+       description: "Comprehensive multi-country calendar filtered for medium and high importance volatility events.",
+       url: "https://sslecal2.investing.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=5&calType=week&timeZone=55&lang=1",
+       icon: <CalendarIcon className="text-purple-500" />,
+       tags: ["Volatility", "Global", "Investing.com"]
+     },
+    {
+      title: "CME FedWatch Tool",
+      description: "Analyze the probabilities of FOMC rate moves based on Fed Funds futures pricing. Critical for macro positioning.",
+      url: "https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html",
+      icon: <Scale className="text-cyan-400" />,
+      tags: ["Macro", "Interest Rates", "FOMC"]
     }
   ];
 
@@ -668,6 +868,17 @@ export default function App() {
   const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+      ReactGA.initialize("G-B92TM15HNG");
+  }, []);
+
+  useEffect(() => {
+    ReactGA.send({
+      hitType: "pageview",
+      page: window.location.pathname,
+    });
+  }, []);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const query = searchQuery.trim().toUpperCase();
@@ -802,9 +1013,20 @@ export default function App() {
                     <MarketOverviewWidget />
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Clock size={14} className="text-amber-500" /> US Economic Events</h3>
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                        <Clock size={14} className="text-amber-500" /> US Economic Events
+                        <a
+                            href="https://sslecal2.investing.com/?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&importance=2,3&features=datepicker,timezone&countries=5&calType=week&timeZone=55&lang=1"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 hover:text-blue-400 transition-all"
+                          >
+                            View <ExternalLink size={14} />
+                        </a>
+                    </h3>
                     <EconomicCalendar />
                   </div>
+
                </div>
 
                <div className="space-y-4">
