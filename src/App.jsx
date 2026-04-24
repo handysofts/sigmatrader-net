@@ -45,6 +45,8 @@ import {
   Send
 } from 'lucide-react';
 
+const CONTAINER = "max-w-[1400px] 2xl:max-w-[1600px] mx-auto w-full";
+
 // --- Market Status & Dynamic Holiday Component ---
 const MarketStatusBanner = () => {
   const [status, setStatus] = useState({
@@ -609,10 +611,10 @@ const ScreenerHub = () => {
   ];
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto py-6">
+    <div className="w-full space-y-8 animate-in fade-in duration-500 py-6">
       <div className="border-b border-gray-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Screener</span></h2>
+          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Institutional <span className="text-blue-500">Signals</span></h2>
           <p className="text-gray-500 text-sm mt-2 font-medium">Quant-driven filters and professional-grade data pipelines.</p>
         </div>
       </div>
@@ -745,120 +747,153 @@ const SavvyTraderPortfolio = () => {
   const [showQR, setShowQR] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const portfolioUrl = "https://savvytrader.com/vmustafayev/sigmatrader?tab=summary";
-  const qrImageUrl = "https://sigmatrader.net/images/savvy-trader-SigmaTrader-swing-qr-code.png";
+  const qrImageUrl = "/SigmaTrader-Swing-qr-code.png";
+  const [copied, setCopied] = useState(false);
 
   const stats = [
     { label: 'Total Return', value: 'Verified', icon: <TrendingUp size={16} />, color: 'text-emerald-400' },
     { label: 'Primary Strategy', value: 'Swing Trading', icon: <Zap size={16} />, color: 'text-amber-400' },
-    { label: 'Asset Classes', value: 'Equity / Tech', icon: <PieChart size={16} />, color: 'text-blue-400' },
+    { label: 'Asset Classes', value: 'Equity / ETF', icon: <PieChart size={16} />, color: 'text-blue-400' },
     { label: 'Status', value: 'Active', icon: <ShieldCheck size={16} />, color: 'text-emerald-500' }
   ];
 
+  const handleCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(portfolioUrl);
+        setCopied(true);
+
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error("Copy failed", err);
+      }
+  };
+
   return (
-    <div className="w-full flex flex-col gap-8 animate-in fade-in duration-500 max-w-4xl mx-auto py-10 relative">
+    <>
+        <div className="w-full flex flex-col gap-8 animate-in fade-in duration-500 w-full py-10 relative">
 
-      {showQR && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6" onClick={() => setShowQR(false)}>
-          <div className="bg-[#0a0a0a] border border-gray-800 p-8 rounded-[3rem] text-center space-y-6 max-w-sm w-full animate-in zoom-in duration-300 shadow-2xl shadow-blue-500/10" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-2">
-               <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                  <span className="text-[10px] font-black text-gray-400 tracking-[0.2em]">OFFICIAL SAVVYTRADER QR</span>
-               </div>
-               <button onClick={() => setShowQR(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-white"><X size={18} /></button>
-            </div>
-
-            <div className="relative bg-white p-3 rounded-3xl overflow-hidden aspect-square flex items-center justify-center">
-              {!imgLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <Loader2 className="animate-spin text-blue-600" size={32} />
+          {showQR && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md p-6" onClick={() => setShowQR(false)}>
+              <div className="bg-[#0a0a0a] border border-gray-800 p-8 rounded-[3rem] text-center space-y-6 max-w-sm w-full animate-in zoom-in duration-300 shadow-2xl shadow-blue-500/10" onClick={e => e.stopPropagation()}>
+                <div className="flex justify-between items-center mb-2">
+                   <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="text-[10px] font-black text-gray-400 tracking-[0.2em]">OFFICIAL SAVVYTRADER QR</span>
+                   </div>
+                   <button onClick={() => setShowQR(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-gray-500 hover:text-white"><X size={18} /></button>
                 </div>
-              )}
-              <img
-                src={qrImageUrl}
-                alt="SigmaTrader QR Code"
-                className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                onLoad={() => setImgLoaded(true)}
-              />
-            </div>
 
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-white tracking-tight">SigmaTrader Swing</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Scan with your mobile camera to launch the verified portfolio terminal instantly.</p>
-            </div>
+                <div className="relative bg-white p-3 rounded-3xl overflow-hidden aspect-square flex items-center justify-center">
+                  {!imgLoaded && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                      <Loader2 className="animate-spin text-blue-600" size={32} />
+                    </div>
+                  )}
+                  <img
+                    src={qrImageUrl}
+                    alt="SigmaTrader QR Code"
+                    className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setImgLoaded(true)}
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <button
-                onClick={() => setShowQR(false)}
-                className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-white/5"
-              >
-                Close
-              </button>
-              <a
-                href={qrImageUrl}
-                download
-                target="_blank"
-                className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-2"
-              >
-                <Download size={14} /> Save
-              </a>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-white tracking-tight">SigmaTrader Swing</h3>
+                  <p className="text-gray-500 text-xs leading-relaxed">Scan with your mobile camera to launch the verified portfolio terminal instantly.</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <button
+                    onClick={() => setShowQR(false)}
+                    className="py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-white/5"
+                  >
+                    Close
+                  </button>
+                  <a
+                    href={qrImageUrl}
+                    download
+                    target="_blank"
+                    className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-2"
+                  >
+                    <Download size={14} /> Save
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
+              <Award size={12} /> Verified Track Record
+            </div>
+            <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Strategy Portfolio</span></h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map((s, idx) => (
+              <div key={idx} className="bg-gray-900/40 border border-gray-800 p-6 rounded-3xl text-center space-y-2 hover:border-gray-700 transition-all">
+                <div className={`mx-auto w-10 h-10 rounded-2xl bg-gray-800 flex items-center justify-center ${s.color}`}>
+                  {s.icon}
+                </div>
+                <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{s.label}</div>
+                <div className="text-lg font-bold text-white">{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="relative group bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-1 shadow-2xl shadow-blue-500/20">
+            <div className="bg-gray-950 rounded-[2.3rem] p-10 flex flex-col items-center text-center gap-6 overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
+                 <BarChart size={200} />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-white">Full Trade Transparency</h3>
+                <p className="text-gray-500 text-sm">SavvyTrader prohibits direct embedding for security. Launch the portal below to view all current Swing positions and trade history.</p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center z-10">
+                  <div className="mt-8 flex flex-col items-center gap-3">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                      Scan to Open Portfolio
+                    </p>
+
+                    <img
+                      src={qrImageUrl}
+                      alt="SigmaTrader QR Code"
+                      onClick={() => setShowQR(true)}
+                      className="w-36 h-36 p-2 bg-white rounded-2xl cursor-pointer hover:scale-105 transition-all shadow-lg" />
+
+                    <div className="flex flex-col items-center gap-2 mt-2">
+                      <a
+                        href={portfolioUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-400 hover:text-blue-300 font-bold break-all text-center" >
+                        Open Portfolio ↗
+                      </a>
+
+                      <button
+                          onClick={handleCopy}
+                          className="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white transition">
+                          Copy Link
+                      </button>
+                    </div>
+                  </div>
+              </div>
             </div>
           </div>
         </div>
-      )}
 
-      <div className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
-          <Award size={12} /> Verified Track Record
-        </div>
-        <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Swing Trades</span></h2>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {stats.map((s, idx) => (
-          <div key={idx} className="bg-gray-900/40 border border-gray-800 p-6 rounded-3xl text-center space-y-2 hover:border-gray-700 transition-all">
-            <div className={`mx-auto w-10 h-10 rounded-2xl bg-gray-800 flex items-center justify-center ${s.color}`}>
-              {s.icon}
+        {copied && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-xl shadow-lg text-xs font-bold text-white flex items-center gap-2">
+              <span>Copied</span>
+              <span className="text-emerald-400">✅</span>
             </div>
-            <div className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{s.label}</div>
-            <div className="text-lg font-bold text-white">{s.value}</div>
           </div>
-        ))}
-      </div>
-
-      <div className="relative group bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2.5rem] p-1 shadow-2xl shadow-blue-500/20">
-        <div className="bg-gray-950 rounded-[2.3rem] p-10 flex flex-col items-center text-center gap-6 overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
-             <BarChart size={200} />
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="text-2xl font-black text-white">Full Trade Transparency</h3>
-            <p className="text-gray-500 text-sm">SavvyTrader prohibits direct embedding for security. Launch the portal below to view all current Swing positions and trade history.</p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center z-10">
-            <a
-              href={portfolioUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group/btn relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all transform hover:scale-105 active:scale-95 shadow-xl shadow-blue-600/30"
-            >
-              Launch Portal
-              <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-            </a>
-
-            <button
-              onClick={() => setShowQR(true)}
-              className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-black uppercase tracking-[0.15em] text-sm transition-all"
-            >
-              <QrCode size={18} />
-              Share QR
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        )}
+    </>
   );
 };
 
@@ -910,7 +945,7 @@ export default function App() {
       <TickerTape />
 
       <nav className="sticky top-0 z-50 border-b border-gray-800 bg-[#050505]/95 backdrop-blur-xl">
-        <div className="max-w-full mx-auto px-6 h-16 flex items-center justify-between gap-4 md:gap-8">
+        <div className={`${CONTAINER} px-6 h-16 flex items-center justify-between`}>
           <button onClick={() => setView('HOME')} className="flex items-center gap-3 group shrink-0">
                <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:rotate-12 transition-transform">
                   <Activity className="text-white" size={24} />
@@ -934,10 +969,10 @@ export default function App() {
 
           <div className="hidden lg:flex items-center gap-2 overflow-x-auto custom-scrollbar no-scrollbar whitespace-nowrap">
              <button onClick={() => setView('HOME')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'HOME' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
-                <Home size={14} /> Home
+                <Home size={14} /> Dashboard
              </button>
              <button onClick={() => setView('SCREENER')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'SCREENER' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
-                <Filter size={14} /> Screener
+                <Filter size={14} /> Signals
              </button>
              <button onClick={() => setView('TERMINAL')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'TERMINAL' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Monitor size={14} /> Terminal
@@ -1004,9 +1039,9 @@ export default function App() {
       )}
 
       <main className="flex-1 overflow-y-auto bg-gradient-to-b from-gray-900/10 to-black">
-        <div className="w-full px-6 py-8">
+        <div className={`${CONTAINER} px-6 py-8`}>
           {view === 'HOME' && (
-            <div className="max-w-[1600px] mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
                <MarketStatusBanner />
 
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1048,11 +1083,7 @@ export default function App() {
 
           {view === 'SCREENER' && <ScreenerHub />}
 
-          {view === 'PORTFOLIO' && (
-            <div className="max-w-[1400px] mx-auto">
-               <SavvyTraderPortfolio />
-            </div>
-          )}
+          {view === 'PORTFOLIO' && <SavvyTraderPortfolio />}
 
           {view === 'TERMINAL' && (
             <div className="space-y-8 animate-in fade-in duration-500">
