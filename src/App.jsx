@@ -1008,14 +1008,14 @@ export default function App() {
                  <button onClick={() => navigate('HOME')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'HOME' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
                     <div className="flex items-center gap-4">
                        <Home size={24} />
-                       <span className="font-black uppercase tracking-widest text-sm">Market Home</span>
+                       <span className="font-black uppercase tracking-widest text-sm">Dashboard</span>
                     </div>
                     <ChevronRight size={18} />
                  </button>
                  <button onClick={() => navigate('SCREENER')} className={`w-full flex items-center justify-between p-6 rounded-3xl border ${view === 'SCREENER' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-gray-900/50 border-gray-800 text-gray-300'}`}>
                     <div className="flex items-center gap-4">
                        <Monitor size={24} />
-                       <span className="font-black uppercase tracking-widest text-sm">Screener Hub</span>
+                       <span className="font-black uppercase tracking-widest text-sm">Signals</span>
                     </div>
                     <ChevronRight size={18} />
                  </button>
