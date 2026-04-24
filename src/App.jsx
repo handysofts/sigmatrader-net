@@ -826,7 +826,7 @@ const SavvyTraderPortfolio = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
               <Award size={12} /> Verified Track Record
             </div>
-            <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Strategy Portfolio</span></h2>
+            <h2 className="text-5xl font-black text-white tracking-tight text-center">SigmaTrader <span className="text-blue-500 text-nowrap">Portfolio</span></h2>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
