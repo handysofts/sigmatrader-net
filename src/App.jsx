@@ -42,7 +42,8 @@ import {
   Menu,
   Landmark,
   MessageSquare,
-  Send
+  Send,
+  Grid2x2
 } from 'lucide-react';
 
 const CONTAINER = "max-w-[1400px] 2xl:max-w-[1600px] mx-auto w-full";
@@ -1067,6 +1068,17 @@ export default function App() {
                </div>
 
                <div className="space-y-4">
+                   <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                      <Grid2x2 size={14} className="text-red-500" /> HeatMap
+                      <a
+                          href="https://www.tradingview.com/heatmap/stock"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 hover:text-blue-400 transition-all"
+                        >
+                          View <ExternalLink size={14} />
+                      </a>
+                  </h3>
                   <MarketHeatmap />
                </div>
 
