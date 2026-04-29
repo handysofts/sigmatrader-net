@@ -903,7 +903,7 @@ const SavvyTraderPortfolio = () => {
 export default function App() {
   const [view, setView] = useState('HOME');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentSymbol, setCurrentSymbol] = useState('NASDAQ:AAPL');
+  const [currentSymbol, setCurrentSymbol] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -917,12 +917,36 @@ export default function App() {
     });
   }, []);
 
+    useEffect(() => {
+      const params = new URLSearchParams(window.location.search);
+      const ticker = params.get('ticker');
+
+      if (ticker) {
+        const symbol = ticker.toUpperCase();
+        setCurrentSymbol(symbol);
+        setView('TERMINAL');
+      }
+    }, []);
+
+    useEffect(() => {
+      const url = new URL(window.location.href);
+
+      if (view === 'TERMINAL' && currentSymbol) {
+        url.searchParams.set('ticker', currentSymbol);
+      } else {
+        url.searchParams.delete('ticker');
+      }
+
+      window.history.replaceState({}, '', url);
+    }, [currentSymbol, view]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     const query = searchQuery.trim().toUpperCase();
     if (!query) return;
     setCurrentSymbol(query);
     setView('TERMINAL');
+
     setSearchQuery('');
   };
 
@@ -938,6 +962,11 @@ export default function App() {
 
   const navigate = (newView) => {
     setView(newView);
+
+    if (newView !== 'TERMINAL') {
+        setCurrentSymbol('');
+    }
+
     setIsMobileMenuOpen(false);
   };
 
