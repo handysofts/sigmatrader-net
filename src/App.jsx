@@ -981,6 +981,13 @@ export default function App() {
              <button onClick={() => setView('PORTFOLIO')} className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${view === 'PORTFOLIO' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white'}`}>
                 <Briefcase size={14} /> Portfolio
              </button>
+             <a
+                 href="https://blog.sigmatrader.net/"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 className="text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl transition-all flex items-center gap-2 text-gray-400 hover:text-white hover:bg-gray-800">
+                 <Globe size={14} /> Blog
+             </a>
           </div>
 
           <button
